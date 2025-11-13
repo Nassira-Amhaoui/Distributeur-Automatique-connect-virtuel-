@@ -1,0 +1,58 @@
+[
+    {
+        "id": "b1fe33d230ba3adb",
+        "type": "ui_button",
+        "z": "7e0bf623f02788b2",
+        "name": "Acheter",
+        "group": "dashboard_group",
+        "order": 22,
+        "width": 2,
+        "height": 1,
+        "passthru": false,
+        "label": "Acheter",
+        "tooltip": "",
+        "color": "#ffffff",
+        "bgcolor": "#28a745",
+        "className": "",
+        "icon": "mi-shopping_cart",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "",
+        "topicType": "str",
+        "x": 80,
+        "y": 200,
+        "wires": [
+            [
+                "42ffd4a71708ebfa"
+            ]
+        ]
+    },
+    {
+        "id": "dashboard_group",
+        "type": "ui_group",
+        "name": "Supermarché",
+        "tab": "dashboard_tab",
+        "order": 1,
+        "disp": true,
+        "width": 30,
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "dashboard_tab",
+        "type": "ui_tab",
+        "name": "Supermarché",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "eb50d07a6b6eb1ed",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-dashboard": "3.6.1"
+        }
+    }
+]
