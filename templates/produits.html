@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <section class="products-container">
+        <div class="products-header">
+            <h2>Produits</h2>
+            <button class="btn-add" id="openModal">+ Ajouter un produit</button>
+        </div>
+        <!-- Modal -->
+        <div id="productModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>Ajouter un produit</h3>
+                <form id="addProductForm" method="POST" action="{{ url_for('ajouter_produit') }}">
+                    <label for="nom">Nom :</label>
+                    <input type="text" id="nom" name="nom" required>
+
+                    <label for="etage">Étage :</label>
+                    <input type="number" id="etage" name="etage" required>
+
+                    <label for="quantite">Quantité :</label>
+                    <input type="number" id="quantite" name="quantite" required>
+
+                    <button type="submit" class="btn-add">Ajouter</button>
+                </form>
+            </div>
+        </div>
+        <!-- MENU CLIC DROIT -->
+        <div id="contextMenu" class="context-menu">
+            <ul>
+                <li id="btnEdit">Modifier</li>
+                <li id="btnDelete">Supprimer</li>
+            </ul>
+        </div>
+
+        <!-- MODAL MODIFIER PRODUIT -->
+        <div id="editModal" class="modal">
+            <div class="modal-content">
+                <span class="close" id="closeEdit">&times;</span>
+                <h3>Modifier le produit</h3>
+
+                <form action="/modifier_produit" method="POST">
+                    <input type="hidden" id="edit_id" name="id">
+
+                    <label>Nom :</label>
+                    <input type="text" id="edit_nom" name="nom">
+
+                    <label>Étage :</label>
+                    <input type="number" id="edit_etage" name="etage">
+
+                    <label>Quantité :</label>
+                    <input type="number" id="edit_quantite" name="quantite">
+
+                    <button class="btn-add" type="submit">Enregistrer</button>
+                </form>
+            </div>
+        </div>
+        <!-- MODAL SUPPRESSION -->
+        <div id="deleteModal" class="modal">
+            <div class="modal-content">
+                <h3 style="margin-bottom: 10px;">Supprimer ce produit ?</h3>
+                <p>Êtes-vous sûr de vouloir supprimer ce produit ?</p>
+
+                <form action="/supprimer_produit" method="POST">
+                    <input type="hidden" id="delete_id" name="id">
+
+                    <div style="display:flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                        <button type="button" class="btn-cancel" id="closeDelete">Annuler</button>
+                        <button type="submit" class="btn-delete">Supprimer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+
+        <table class="products-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Étage</th>
+                    <th>Quantité</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in produits %}
+                <tr>
+                    <td>{{ p.Id_Produit }}</td>
+                    <td>{{ p.Nom }}</td>
+                    <td>{{ p.N_Etage }}</td>
+                    <td>{{ p.Quantite }}</td>
+                </tr>
+                {% endfor %}
+                {% if produits|length == 0 %}
+                <tr>
+                    <td colspan="4" style="text-align:center; padding:20px;">
+                        Aucun produit trouvé.
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </section>
+</div>
+<script>
+const modal = document.getElementById("productModal");
+const btn = document.getElementById("openModal");
+const span = document.getElementsByClassName("close")[0];
+
+// Ouvrir le modal
+btn.onclick = function() {
+    modal.style.display = "block";
+}
+
+// Fermer le modal
+span.onclick = function() {
+    modal.style.display = "none";
+}
+
+// Fermer si clic en dehors du modal
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+</script>
+<script>
+let selectedProduct = null;
+
+// Empêcher le menu clic droit par défaut
+document.addEventListener("contextmenu", e => {
+    e.preventDefault();
+});
+
+// Clic droit sur une ligne du tableau
+document.querySelectorAll(".products-table tbody tr").forEach(row => {
+    row.addEventListener("contextmenu", e => {
+        selectedProduct = {
+            id: row.children[0].innerText,
+            nom: row.children[1].innerText,
+            etage: row.children[2].innerText,
+            quantite: row.children[3].innerText
+        };
+
+        // Afficher menu contextuel
+        const menu = document.getElementById("contextMenu");
+        menu.style.display = "block";
+        menu.style.left = e.pageX + "px";
+        menu.style.top = e.pageY + "px";
+    });
+});
+
+// Cacher le menu contextuel en cliquant ailleurs
+document.addEventListener("click", () => {
+    document.getElementById("contextMenu").style.display = "none";
+});
+
+// Bouton Modifier
+document.getElementById("btnEdit").addEventListener("click", () => {
+    document.getElementById("edit_id").value = selectedProduct.id;
+    document.getElementById("edit_nom").value = selectedProduct.nom;
+    document.getElementById("edit_etage").value = selectedProduct.etage;
+    document.getElementById("edit_quantite").value = selectedProduct.quantite;
+
+    document.getElementById("editModal").style.display = "block";
+});
+
+// Fermer le modal modifier
+document.getElementById("closeEdit").onclick = function() {
+    document.getElementById("editModal").style.display = "none";
+};
+</script>
+<script>
+    // Bouton Supprimer
+document.getElementById("btnDelete").addEventListener("click", () => {
+    document.getElementById("delete_id").value = selectedProduct.id;
+    document.getElementById("deleteModal").style.display = "block";
+});
+
+// Fermer modal delete
+document.getElementById("closeDelete").onclick = function() {
+    document.getElementById("deleteModal").style.display = "none";
+};
+
+</script>
+{% endblock %}
