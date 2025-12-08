@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/history.css') }}">
+
+<h1 class="page-title">Historique des Produits</h1>
+
+<div class="history-container-dashboard">
+    {% for p in produits %}
+    <div class="product-dashboard-card">
+        <div class="card-header-dashboard">
+            <div>
+                <h2>{{ p.Nom }}</h2>
+                <p class="stock">Stock actuel : <strong>{{ p.Quantite }}</strong></p>
+            </div>
+        </div>
+        <div class="chart-wrapper">
+            <canvas id="chart{{ p.Id_Produit }}"></canvas>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Données brutes en JSON -->
+<div id="__historiqueData" data-json='{{ historique | tojson | safe }}'></div>
+
+<!-- Chart.js + plugin zoom -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const dataContainer = document.getElementById("__historiqueData");
+    const rawData = JSON.parse(dataContainer.dataset.json);
+    const charts = {};
+
+    function buildChartData() {
+        const result = {};
+        Object.keys(rawData).forEach(pid => {
+            const labels = [];
+            const data_ajouter = [];
+            const data_acheter = [];
+
+            // trier les données par date croissante
+            rawData[pid].sort((a,b) => new Date(a.Date_Action) - new Date(b.Date_Action));
+
+            rawData[pid].forEach(e => {
+                const dt = new Date(e.Date_Action);
+                labels.push(dt.toLocaleString()); // affichage lisible
+                data_ajouter.push(e.Action === "ajouter" ? e.Quantite : 0);
+                data_acheter.push(e.Action === "acheter" ? e.Quantite : 0);
+            });
+
+            result[pid] = { labels, data_ajouter, data_acheter };
+        });
+        return result;
+    }
+
+    function renderCharts() {
+        const chartData = buildChartData();
+
+        Object.keys(chartData).forEach(pid => {
+            const canvas = document.getElementById("chart" + pid);
+            if (!canvas) return;
+
+            if (charts[pid]) charts[pid].destroy();
+
+            charts[pid] = new Chart(canvas, {
+                type: "line",
+                data: {
+                    labels: chartData[pid].labels,
+                    datasets: [
+                        {
+                            label: "Ajouter",
+                            data: chartData[pid].data_ajouter,
+                            borderColor: "green",
+                            backgroundColor: "rgba(0,255,0,0.1)",
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: 3
+                        },
+                        {
+                            label: "Acheter",
+                            data: chartData[pid].data_acheter,
+                            borderColor: "red",
+                            backgroundColor: "rgba(255,0,0,0.1)",
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: 3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' },
+                        zoom: {
+                            pan: { enabled: true, mode: 'x' }, // déplacement horizontal
+                            zoom: {
+                                wheel: { enabled: true },       // zoom avec molette
+                                pinch: { enabled: true },       // zoom tactile
+                                mode: 'x'
+                            }
+                        }
+                    },
+                    scales: { y: { beginAtZero: true }, x: { display: true } }
+                }
+            });
+        });
+    }
+
+    // rendu initial
+    renderCharts();
+});
+</script>
+
+{% endblock %}
