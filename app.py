@@ -13,6 +13,18 @@ def get_db_connection():
 @app.route('/')
 def dashboard():
     return render_template('dashboard.html')
+@app.context_processor
+def inject_notifications():
+    db = get_db_connection()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT Nom, Quantite FROM Produit WHERE Quantite < 2")
+    produits_faible = cursor.fetchall()
+    cursor.close()
+    
+    notif_count = len(produits_faible)  # nombre de notifications
+    
+    return dict(produits_faible=produits_faible, notif_count=notif_count)
+
 
 @app.route('/produits')
 def produits():
