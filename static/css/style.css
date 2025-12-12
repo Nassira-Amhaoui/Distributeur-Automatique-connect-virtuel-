@@ -1,62 +1,196 @@
-body {
+/* --- RESET ET BASE --- */
+* {
+    box-sizing: border-box;
     margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f5f7fb;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
 }
 
-/* Layout */
+body {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+    transition: background-color 0.3s;
+}
+
+body.dark {
+    background-color: #1f1f1f;
+    color: #eee;
+}
+
+/* --- LAYOUT PRINCIPAL --- */
 .layout {
     display: flex;
+    width: 100%;
 }
 
-/* Sidebar */
+/* --- SIDEBAR --- */
 .sidebar {
-    width: 230px;
-    background: #ffffff;
-    border-right: 1px solid #e2e6ef;
-    height: 100vh;
+    position: fixed; /* reste fixe */
+    top: 0;
+    left: 0;
+    height: 100vh; /* prend toute la hauteur */
+    width: 220px; /* largeur du menu */
+    background-color: #2c3e50;
+    color: #fff;
     display: flex;
     flex-direction: column;
+    justify-content: space-between; /* espace entre menu et user-box */
+    padding: 20px 0;
+    transition: all 0.3s;
+    z-index: 100;
 }
 
+body.dark .sidebar {
+    background-color: #111;
+}
+
+/* --- LOGO --- */
 .logo {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    padding: 20px;
-    font-size: 18px;
-    font-weight: bold;
+    text-align: center;
+    margin-bottom: 40px;
 }
 
 .logo-box {
-    background: #3b82f6;
-    color: #fff;
-    padding: 10px;
+    background-color: #34495e;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border-radius: 8px;
-    margin-right: 10px;
+    font-weight: bold;
+    margin-bottom: 10px;
 }
 
-/* Menu */
+.logo span {
+    font-size: 14px;
+    line-height: 1.2;
+}
+
+/* --- MENU --- */
 .menu {
     display: flex;
     flex-direction: column;
-    padding: 10px;
+    flex-grow: 1;
+    justify-content: center; /* centre verticalement les liens */
 }
 
 .menu a {
-    padding: 12px;
-    border-radius: 8px;
     display: flex;
     align-items: center;
-    color: #333;
+    padding: 12px 25px;
+    color: #fff;
     text-decoration: none;
-    gap: 10px;
+    font-size: 16px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.menu a i {
+    margin-right: 10px;
 }
 
 .menu a:hover,
-.menu .active {
-    background: #e6edff;
-    color: #3b82f6;
+.menu a.active {
+    background-color: #1abc9c;
+    color: #fff;
+}
+
+/* --- USER BOX --- */
+.user-box {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-box .avatar {
+    width: 40px;
+    height: 40px;
+    background-color: #1abc9c;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
     font-weight: bold;
+    color: #fff;
+}
+
+/* --- CONTENT --- */
+.content {
+    margin-left: 220px; /* décalage pour laisser la place au menu */
+    flex: 1;
+    padding: 20px;
+}
+
+/* --- TOPBAR --- */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-bottom: 1px solid #ddd;
+}
+
+body.dark .topbar {
+    background-color: #222;
+    border-bottom-color: #333;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 180px;
+    }
+
+    .content {
+        margin-left: 180px;
+    }
+
+    .menu a {
+        font-size: 14px;
+        padding: 10px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar {
+        width: 60px;
+        padding: 10px 0;
+    }
+
+    .content {
+        margin-left: 60px;
+    }
+
+    .menu a {
+        justify-content: center;
+        padding: 10px 0;
+    }
+
+    .menu a i {
+        margin: 0;
+    }
+
+    .menu a span {
+        display: none;
+    }
+
+    .logo span {
+        display: none;
+    }
+
+    .user-box p {
+        display: none;
+    }
 }
 
 /* User Bottom Box */
@@ -138,7 +272,7 @@ body {
 /* Dark/Light toggle */
 .switch {
     position: relative;
-    width: 45px;
+    width: 50px;
     height: 22px;
 }
 
@@ -260,7 +394,7 @@ body.dark .products table {
 
 /* ON -> DARK */
 .theme-toggle input:checked ~ .toggle-circle {
-    transform: translateX(40px);
+    transform: translateX(35px);
 }
 
 .theme-toggle input:checked ~ .sun {
@@ -653,53 +787,134 @@ body.dark .btn-cancel {
 body.dark .btn-delete {
     background: #9b2c2c;
 }
-/* --- PANEL NOTIFICATIONS --- */
+
+
+
+/* --- NOTIFICATION WRAPPER --- */
+.notification-wrapper {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+/* Icone cloche */
+#bell-icon {
+    width: 24px;
+    height: 24px;
+    stroke: #555;
+    transition: stroke 0.3s;
+}
+
+.notification-wrapper:hover #bell-icon {
+    stroke: #1abc9c;
+}
+
+/* Badge de notification */
+.notif-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: #e74c3c;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    transition: all 0.3s;
+}
+
+/* Badge caché si zéro */
+.notif-badge:empty {
+    display: none;
+}
+
+/* PANEL NOTIFICATIONS */
+/* PANEL NOTIFICATIONS */
 .notification-panel {
     position: absolute;
-    top: 70px;
-    right: 20px;
-    width: 300px;
+    top: 36px; /* juste en dessous de l'icône */
+    right: 0;
+    width: 320px;
+    max-height: 400px;
+    overflow-y: auto;
     background: #fff;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    border-radius: 12px;
-    padding: 15px;
-    z-index: 200;
+    border-radius: 10px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    padding: 12px 16px;
+    z-index: 999;
+    opacity: 0;           /* caché par défaut */
+    pointer-events: none;  /* clics inactifs quand caché */
     transition: all 0.3s ease;
+}
+
+
+/* Affichage du panel */
+.notification-panel.show {
     opacity: 1;
+    pointer-events: auto;
 }
 
-.notification-panel.hidden {
-    opacity: 0;
-    transform: translateY(-10px);
-    pointer-events: none;
-}
-
+/* Panel header */
 .notification-panel h3 {
     margin-bottom: 10px;
-    font-size: 18px;
+    font-size: 16px;
+    font-weight: 600;
     color: #333;
 }
 
+/* Liste notifications */
 .notification-panel ul {
-    padding-left: 15px;
+    list-style: none;
+    max-height: 320px;
+    overflow-y: auto;
+    padding-left: 0;
+    margin: 0;
 }
 
 .notification-panel ul li {
-    margin-bottom: 8px;
-    font-size: 15px;
+    padding: 8px 0;
+    font-size: 14px;
     color: #555;
+    border-bottom: 1px solid #eee;
+}
+
+.notification-panel ul li:last-child {
+    border-bottom: none;
 }
 
 /* --- DARK MODE --- */
+body.dark #bell-icon {
+    stroke: #ccc;
+}
+
+body.dark .notification-wrapper:hover #bell-icon {
+    stroke: #1abc9c;
+}
+
+body.dark .notif-badge {
+    border: 2px solid #1f1f2e;
+    background: #e74c3c;
+}
+
 body.dark .notification-panel {
     background: #1f1f2e;
     color: #eee;
-    box-shadow: 0 8px 20px rgba(255,255,255,0.05);
+    box-shadow: 0 8px 25px rgba(255,255,255,0.05);
 }
 
 body.dark .notification-panel ul li {
+    border-bottom: 1px solid #333;
     color: #ccc;
 }
-.hidden {
-    display: none;
+body.drak .notification-panel h3 {
+    margin-bottom: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #fcf7f7;
 }
