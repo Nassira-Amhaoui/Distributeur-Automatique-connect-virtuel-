@@ -23,15 +23,21 @@
         </div>
 
         <nav class="menu">
-            <a href="{{ url_for('dashboard') }}" class="active"><i data-feather="home"></i> Dashboard</a>
-            <a href="{{ url_for('produits') }}" 
-                class="{% if active=='produits' %}active{% endif %}">
+            <a href="{{ url_for('dashboard') }}" class="{% if active=='dashboard' %}active{% endif %}">
+                <i data-feather="home"></i> Dashboard
+            </a>
+            <a href="{{ url_for('produits') }}" class="{% if active=='produits' %}active{% endif %}">
                 <i data-feather="package"></i> Produits
             </a>
-
-            <a href="{{ url_for('product_history') }}"><i data-feather="pie-chart"></i> Analytics</a>
-            <a href="{{ url_for('users') }}"><i data-feather="users"></i> Users</a>
-            <a href="{{ url_for('settings') }}"><i data-feather="settings"></i> Settings</a>
+            <a href="{{ url_for('product_history') }}" class="{% if active=='product_history' %}active{% endif %}">
+                <i data-feather="pie-chart"></i> Analytics
+            </a>
+            <a href="{{ url_for('users') }}" class="{% if active=='users' %}active{% endif %}">
+                <i data-feather="users"></i> Users
+            </a>
+            <a href="{{ url_for('settings') }}" class="{% if active=='settings' %}active{% endif %}">
+                <i data-feather="settings"></i> Settings
+            </a>
         </nav>
 
 
@@ -54,32 +60,41 @@
                 <i data-feather="search"></i>
                 <input type="text" id="productSearch" placeholder="Search...">
             </div>
-            <!-- Notification Panel -->
-            <div id="notification-panel" class="notification-panel hidden">
-                <h3>Notifications</h3>
+           
 
-                <ul>
-                    <li>Aucun nouvelle notification.</li>
-                </ul>
+        <div class="top-icons">
+           <div class="notification-wrapper" style="position: relative;" data-count="{{ produits_faible|length }}">
+                <i data-feather="bell" id="bell-icon"></i>
+                <span id="notif-badge" class="notif-badge"></span>
+
+                <div id="notification-panel" class="notification-panel hidden">
+                    <h3>Notifications</h3>
+                    <ul>
+                        {% if produits_faible %}
+                            {% for p in produits_faible %}
+                                <li>⚠️ {{ p.Nom }} est presque épuisé ({{ p.Quantite }})</li>
+                            {% endfor %}
+                        {% else %}
+                            <li>Aucune nouvelle notification.</li>
+                        {% endif %}
+                    </ul>
+                </div>
             </div>
 
 
+            <!-- Toggle Light/Dark -->
+            <label class="theme-toggle" id="themeToggle">
+                <input type="checkbox" id="themeCheckbox">
+                <span class="toggle-circle"></span>
+                <span class="icon sun">☀️</span>
+                <span class="icon moon">🌙</span>
+            </label>
 
-            <div class="top-icons">
-                <i data-feather="bell"></i>
+            <img src="https://via.placeholder.com/36" class="admin-img">
+        </div>
 
-                <!-- Toggle Light/Dark -->
-                <label class="theme-toggle" id="themeToggle">
-                    <input type="checkbox" id="themeCheckbox">
-                    <span class="toggle-circle"></span>
-                    <span class="icon sun">☀️</span>
-                    <span class="icon moon">🌙</span>
-                </label>
-
-
-                <img src="https://via.placeholder.com/36" class="admin-img">
-            </div>
         </header>
+
         <section class="page-content">
             {% block content %}{% endblock %}
         </section>
@@ -87,74 +102,84 @@
 </div>
 
 <script>
-feather.replace();
+document.addEventListener("DOMContentLoaded", function() {
+    // Remplacer les icônes Feather
+    feather.replace();
 
-/* --- THEME TOGGLE FIXED --- */
-const themeSwitch = document.querySelector("#themeToggle input");
+    // Notifications
+    const bellWrapper = document.querySelector('.notification-wrapper');
+    const bellIcon = bellWrapper.querySelector('svg');
+    const notifPanel = document.getElementById("notification-panel");
+    const notifBadge = document.getElementById("notif-badge");
 
-themeSwitch.addEventListener("change", () => {
-    document.body.classList.toggle("dark");
-});
-</script>
-<script>
-const searchInput = document.getElementById('productSearch');
-const table = document.querySelector('.products-table tbody');
-const rows = table.querySelectorAll('tr');
+    const notifWrapper = document.getElementById("notif-wrapper");
 
-searchInput.addEventListener('input', function() {
-    const filter = this.value.toLowerCase();
+    let count = parseInt(bellWrapper.dataset.count) || 0;
 
-    let hasVisible = false;
+    if(count > 0){
+        notifBadge.textContent = count;
+        notifBadge.style.display = "flex"; // centré
+    } else {
+        notifBadge.style.display = "none";
+    }
 
-    rows.forEach(row => {
-        const cells = row.querySelectorAll('td');
-        let match = false;
-
-        cells.forEach(cell => {
-            if (cell.textContent.toLowerCase().includes(filter)) {
-                match = true;
-            }
+     // Toggle affichage panel notifications
+    if(bellIcon){
+        bellIcon.addEventListener("click", (e) => {
+            e.stopPropagation();
+            notifPanel.classList.toggle("show"); // <-- ici on toggle "show"
+            notifBadge.style.display = "none";   // cache le badge quand ouvert
         });
+    }
 
-        if (match) {
-            row.style.display = '';
-            hasVisible = true;
-        } else {
-            row.style.display = 'none';
+    // Clic en dehors pour fermer le panel
+    document.addEventListener("click", (e) => {
+        if (!notifPanel.contains(e.target) && e.target !== bellIcon) {
+            notifPanel.classList.remove("show"); // retire "show"
         }
     });
 
-    // Afficher message “Aucun produit trouvé” si rien ne correspond
-    let emptyRow = table.querySelector('.no-match');
-    if (!hasVisible) {
-        if (!emptyRow) {
-            const tr = document.createElement('tr');
-            tr.classList.add('no-match');
-            tr.innerHTML = `<td colspan="4" style="text-align:center; padding:20px;">Aucun produit trouvé.</td>`;
-            table.appendChild(tr);
-        }
-    } else {
-        if (emptyRow) emptyRow.remove();
-    }
-});
-</script>
-<script>
-feather.replace(); // Très important
 
-// Récupérer le SVG généré par Feather
-const bellIcon = document.querySelector('.top-icons svg.feather-bell');
-const notifPanel = document.getElementById("notification-panel");
+    // Theme toggle
+    const themeSwitch = document.getElementById("themeCheckbox");
+    themeSwitch.addEventListener("change", () => {
+        document.body.classList.toggle("dark");
+    });
+ // Theme toggle
+   
+    // Recherche produit (si tableau existe)
+    const searchInput = document.getElementById('productSearch');
+    const table = document.querySelector('.products-table tbody');
+    if(table){
+        const rows = table.querySelectorAll('tr');
+        searchInput.addEventListener('input', function() {
+            const filter = this.value.toLowerCase();
+            let hasVisible = false;
 
-// Toggle du panneau
-bellIcon.addEventListener("click", (e) => {
-    e.stopPropagation(); // empêcher la fermeture instantanée
-    notifPanel.classList.toggle("hidden");
-});
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                let match = false;
+                cells.forEach(cell => {
+                    if(cell.textContent.toLowerCase().includes(filter)){
+                        match = true;
+                    }
+                });
+                row.style.display = match ? '' : 'none';
+                if(match) hasVisible = true;
+            });
 
-// Fermer en cliquant ailleurs
-document.addEventListener("click", (e) => {
-    if (!notifPanel.contains(e.target) && e.target !== bellIcon) {
-        notifPanel.classList.add("hidden");
+            let emptyRow = table.querySelector('.no-match');
+            if(!hasVisible){
+                if(!emptyRow){
+                    const tr = document.createElement('tr');
+                    tr.classList.add('no-match');
+                    tr.innerHTML = `<td colspan="4">Aucun produit trouvé.</td>`;
+                    table.appendChild(tr);
+                }
+            } else {
+                if(emptyRow) emptyRow.remove();
+            }
+        });
     }
 });
 </script>
