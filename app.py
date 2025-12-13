@@ -10,20 +10,71 @@ def get_db_connection():
         password="Nassira2005",
         database="gestion_stock" 
     )
+
+from flask_mail import Mail, Message
+
+app.config.update(
+    MAIL_SERVER='smtp.gmail.com',
+    MAIL_PORT=587,
+    MAIL_USE_TLS=True,
+    MAIL_USERNAME='admin@gmail.com',        # e-mail expéditeur
+    MAIL_PASSWORD='APP_PASSWORD_GMAIL',      # mot de passe d’application
+    MAIL_DEFAULT_SENDER='admin@gmail.com'
+)
+
+mail = Mail(app)
+yugu brdv qkrf mgwh
 @app.route('/')
 def dashboard():
     return render_template('dashboard.html')
-@app.context_processor
 def inject_notifications():
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT Nom, Quantite FROM Produit WHERE Quantite < 2")
+
+    cursor.execute("""
+        SELECT id, Nom, Quantite, email_envoye
+        FROM Produit
+        WHERE Quantite < 2
+    """)
+    
     produits_faible = cursor.fetchall()
+
+    for p in produits_faible:
+        if p["Quantite"] <= 0 and not p["email_envoye"]:
+            envoyer_email_admin(p["Nom"], p["Quantite"])
+
+            cursor.execute(
+                "UPDATE Produit SET email_envoye = 1 WHERE id = %s",
+                (p["id"],)
+            )
+            db.commit()
+
     cursor.close()
+    db.close()
+
+    return dict(
+        produits_faible=produits_faible,
+        notif_count=len(produits_faible)
+    )
+def envoyer_email_admin(nom_produit, quantite):
+    msg = Message(
+        subject="🚨 Alerte Stock – Produit épuisé",
+        recipients=["admin@example.com"]
+    )
     
-    notif_count = len(produits_faible)  # nombre de notifications
-    
-    return dict(produits_faible=produits_faible, notif_count=notif_count)
+    msg.body = f"""
+Bonjour,
+
+Le produit suivant nécessite une intervention :
+
+Produit : {nom_produit}
+Quantité restante : {quantite}
+
+Merci de réapprovisionner le distributeur.
+
+— Système Distributeur Automatique
+"""
+    mail.send(msg)
 
 
 @app.route('/produits')
