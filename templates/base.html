@@ -42,6 +42,7 @@
 
 
 
+
         <div class="user-box">
             <div class="avatar">AS</div>
             <div>
@@ -100,7 +101,22 @@
         </section>
     </main>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    const menuItems = document.querySelectorAll('.menu a');
 
+    menuItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            // Supprimer "selected" de tous les éléments
+            menuItems.forEach(i => i.classList.remove('selected'));
+
+            // Ajouter "selected" à l'élément cliqué
+            this.classList.add('selected');
+        });
+    });
+});
+
+</script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     // Remplacer les icônes Feather
