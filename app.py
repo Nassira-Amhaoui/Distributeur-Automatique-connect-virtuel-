@@ -17,22 +17,42 @@ app.config.update(
     MAIL_SERVER='smtp.gmail.com',
     MAIL_PORT=587,
     MAIL_USE_TLS=True,
-    MAIL_USERNAME='admin@gmail.com',        # e-mail expéditeur
-    MAIL_PASSWORD='APP_PASSWORD_GMAIL',      # mot de passe d’application
-    MAIL_DEFAULT_SENDER='admin@gmail.com'
+    MAIL_USERNAME='amhaouinassira8@gmail.com',        # e-mail expéditeur
+    MAIL_PASSWORD='yugu brdv qkrf mgwh',      # mot de passe d’application
+    MAIL_DEFAULT_SENDER='amhaouinassira8@gmail.com'
 )
+@app.route('/dashboard')
+def dashboard():
+    return render_template("dashboard.html", active="dashboard")
 
 mail = Mail(app)
-yugu brdv qkrf mgwh
-@app.route('/')
-def dashboard():
-    return render_template('dashboard.html')
+def envoyer_email_admin(nom_produit, quantite):
+    msg = Message(
+        subject="🚨 Alerte Stock – Produit épuisé",
+        recipients=["amhaouinassira8@gmail.com"]
+    )
+    
+    msg.body = f"""
+    Bonjour,
+
+    Le produit suivant nécessite une intervention :
+
+    Produit : {nom_produit}
+    Quantité restante : {quantite}
+
+    Merci de réapprovisionner le distributeur.
+
+    — Système Distributeur Automatique
+    """
+    mail.send(msg)
+
+@app.context_processor
 def inject_notifications():
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
 
     cursor.execute("""
-        SELECT id, Nom, Quantite, email_envoye
+        SELECT Id_Produit, Nom, Quantite, email_envoye
         FROM Produit
         WHERE Quantite < 2
     """)
@@ -44,8 +64,8 @@ def inject_notifications():
             envoyer_email_admin(p["Nom"], p["Quantite"])
 
             cursor.execute(
-                "UPDATE Produit SET email_envoye = 1 WHERE id = %s",
-                (p["id"],)
+                "UPDATE Produit SET email_envoye = 1 WHERE Id_Produit = %s",
+                (p["Id_Produit"],)
             )
             db.commit()
 
@@ -56,25 +76,8 @@ def inject_notifications():
         produits_faible=produits_faible,
         notif_count=len(produits_faible)
     )
-def envoyer_email_admin(nom_produit, quantite):
-    msg = Message(
-        subject="🚨 Alerte Stock – Produit épuisé",
-        recipients=["admin@example.com"]
-    )
-    
-    msg.body = f"""
-Bonjour,
 
-Le produit suivant nécessite une intervention :
 
-Produit : {nom_produit}
-Quantité restante : {quantite}
-
-Merci de réapprovisionner le distributeur.
-
-— Système Distributeur Automatique
-"""
-    mail.send(msg)
 
 
 @app.route('/produits')
@@ -88,7 +91,7 @@ def produits():
     cursor.close()
     db.close()
     
-    return render_template("produits.html", produits=produits)
+    return render_template("produits.html", produits=produits, active="produits")
 
 
 @app.route('/ajouter_produit', methods=['POST'])
@@ -221,15 +224,15 @@ def product_history():
         produits=produits,
         historique=historique_par_produit,
         historique_js=historique_js,
-        active="historique"
+        active="historique",active="product_history"
     )
 
 @app.route('/users')
 def users():
-    return render_template('users.html')
+    return render_template('users.html',active="users")
 @app.route('/settings')
 def settings():
-    return render_template('settings.html')
+    return render_template('settings.html',active="settings")
 
 
 if __name__ == "__main__":
