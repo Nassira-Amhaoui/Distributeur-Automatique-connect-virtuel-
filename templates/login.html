@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="page de connexion pour distributeur connect">
+    <meta name="author" content="Noufissa ismaili">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page de connexion</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+</head>
+<body>
+    <div class="login-container">
+        <img class="login-icon" src="{{ url_for('static', filename='login.jpeg')}}" alt="login icon">
+        <h2>connecter-vous avec email</h2>
+        <p class= "subtitle">Gérez vos stocks. C'est simple et facile.</p>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <p style="color: red; font-size: 14px; margin-bottom: 10px;">{{ messages[0] }}</p>
+            {% endif %}
+        {% endwith %}
+        <form method="POST" action="/authentification">
+            <input type="email" name="email" placeholder="Adresse email" required>
+            <input type="password" name="password" placeholder="Mot de passe" required><br>
+            <a href="#" class="forgot-password">Mot de passe oublié?</a>
+            <button type="submit">se connecter</button>
+            </form>
+            <div class="social-login">
+                <p>Ou se connecter avec</p>
+                <a href="#"><img src="{{ url_for('static', filename='facebook.jpg')}}" alt="facebook"></a>
+                <a href="#"><img src="{{ url_for('static', filename='google.jpg')}}" alt="google"></a>
+                <a href="#"><img src="{{ url_for('static', filename='apple.png')}}" alt="apple"></a>
+            </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,69 @@
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("historiqueData chargée :", historiqueData);
+
+    for (const productId in historiqueData) {
+
+        const canvas = document.getElementById("chart" + productId);
+        if (!canvas) {
+            console.warn("Canvas introuvable pour le produit", productId);
+            continue;
+        }
+
+        const h = historiqueData[productId];
+
+        new Chart(canvas, {
+            type: "line",
+            data: {
+                labels: h.labels,
+                datasets: [
+                    {
+                        label: "Ajouter",
+                        data: h.ajouter, // Quantité pour ajout
+                        borderColor: "green",
+                        backgroundColor: "rgba(0,255,0,0.1)",
+                        tension: 0.3,
+                        fill: true,
+                        pointRadius: 3
+                    },
+                    {
+                        label: "Acheter",
+                        data: h.acheter, // Quantité pour achat
+                        borderColor: "red",
+                        backgroundColor: "rgba(255,0,0,0.1)",
+                        tension: 0.3,
+                        fill: true,
+                        pointRadius: 3
+                    }
+                ]
+            },
+           
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top' },
+                    zoom: {
+                        pan: {
+                            enabled: true,
+                            mode: 'x', // déplacement horizontal
+                        },
+                        zoom: {
+                            wheel: {
+                                enabled: true, // zoom avec la molette de la souris
+                            },
+                            pinch: {
+                                enabled: true // zoom tactile sur mobile
+                            },
+                            mode: 'x', // zoom horizontal
+                        }
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true },
+                    x: { display: true }
+                }
+            }
+
+        });
+    }
+});
