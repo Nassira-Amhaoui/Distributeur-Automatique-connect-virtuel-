@@ -1,0 +1,81 @@
+body{
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #e8f4ff, #ffffff);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items:center;
+            margin: 0;
+       }
+        .reset-container{
+            width: 380px;
+            background: #ffffff;
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+       }
+       .reset-icon{
+            width: 75px;
+            height: 75px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.6);
+            display: block;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 20px;
+            object-fit: contain;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.18);
+            padding: 10px;
+        }
+        .reset-icon img{
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        h2{
+            margin-bottom: 10px;
+            font-size: 22px;  
+        }  
+        .subtitle{
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 25px;
+        }
+        input{
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            background: #f7f9fc;
+            margin-bottom: 12px;
+            box-sizing: border-box;
+        }
+        button{
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            background: #2563eb;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover{
+            background-color: #1565c0;
+        }
+        .back-link{
+            display: block;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #2563eb;
+            text-decoration: none;
+        }
+        .back-link:hover{
+            text-decoration: underline;
+        }

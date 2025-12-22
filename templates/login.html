@@ -21,7 +21,7 @@
         <form method="POST" action="/authentification">
             <input type="email" name="email" placeholder="Adresse email" required>
             <input type="password" name="password" placeholder="Mot de passe" required><br>
-            <a href="#" class="forgot-password">Mot de passe oublié?</a>
+            <a href="{{ url_for('forget_password')}}" class="forget-password">Mot de passe oublié?</a>
             <button type="submit">se connecter</button>
             </form>
             <div class="social-login">
