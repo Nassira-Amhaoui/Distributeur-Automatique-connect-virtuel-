@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from itsdangerous import URLSafeTimedSerializer
+from werkzeug.security import generate_password_hash, check_password_hash
 import pymysql
 app = Flask(__name__)
 app.secret_key='votre_cle_secrete'
@@ -49,10 +50,12 @@ def reset_password(token):
         if password != confirm_password:
             flash("Les mots de passe ne correspondent pas")
             return redirect(url_for('reset_password', token=token))
+        hashed_password = generate_password_hash(password)
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("UPDATE utilisateurs SET password = %s WHERE email = %s",(password, email))
+        cursor.execute("UPDATE utilisateurs SET password = %s WHERE email = %s",(hashed_password, email))
         conn.commit()
+        cursor.close()
         conn.close()
         flash("Mot de passe modifié avec succès!")
         return redirect(url_for('login_page'))
@@ -65,15 +68,14 @@ def authentificate():
     cursor = conn.cursor()
     try:
         cursor.execute(
-            "SELECT * FROM utilisateurs WHERE email = %s AND password = %s",
-            (email, password)
+            "SELECT * FROM utilisateurs WHERE email = %s",
+            (email,)
         )
         user = cursor.fetchone()
     finally:
         cursor.close()
         conn.close()
-
-    if user:
+    if user and check_password_hash(user['password'], password):
         return redirect(url_for('dashboard'))
     else:
         flash( "Email ou mot de passe incorrect!")
