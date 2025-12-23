@@ -1,0 +1,42 @@
+
+{% extends "base.html" %}
+{% block title %}Utilisateurs{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='users.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Liste des Utilisateurs</h2>
+</div>
+<div class="user-card">
+    <table class="user-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom d'utilisateur</th>
+                <th>Email</th>
+                <th>Rôle</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.Id_User }}</td>
+            <td>{{ user.UserName }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+                <span class="role role-{{user.role}}"> {{ user.role }}</span>
+            </td>
+        </tr>
+        {%else%}
+        <tr>
+            <td colspan="4" class="empty-row">
+                Aucun utilisateur trouvé.
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

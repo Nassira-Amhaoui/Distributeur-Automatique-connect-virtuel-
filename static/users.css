@@ -1,0 +1,72 @@
+
+.page-header {
+    margin-bottom: 25px;
+}
+.page-header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1e293b;
+}
+.page-header p {
+    font-size: 14px;
+    color: #64748b;
+}
+.user-card {
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    background: #ffffff;
+}
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.user-table thead {
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    color: #ffffff;
+}
+.user-table th, .user-table td {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 14px;
+}
+.user-table tbody tr {
+    border-bottom: 1px solid #e5e7eb;
+    transition: background-color 0.2s ease;
+}
+.user-table tbody tr:hover {
+    background: #f1f5f9;
+}
+.role{
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+.role.admin {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+.role.user {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+.empty-row {
+    text-align: center;
+    padding: 30px;
+    color: #94a3b8;
+}
+.action-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 8px;
+}
+.action-edit {
+    color: #2563eb;
+}
+.action-delete {
+    color: #dc2626;
+}

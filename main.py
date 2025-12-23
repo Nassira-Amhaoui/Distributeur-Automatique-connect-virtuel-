@@ -83,6 +83,24 @@ def authentificate():
 @app.route('/dashboard')
 def dashboard():
     return render_template('dashboard.html')
+@app.route('/users')
+def users():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("select Id_User, UserName, email, role from utilisateurs")
+    users = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('users.html', users=users)
+@app.route('/produits')
+def produits():
+    return render_template('produits.html')
+@app.route('/analytics')
+def analytics():
+    return render_template('analytics.html')
+@app.route('/settings')
+def settings():
+    return render_template('settings.html')
 if __name__ == "__main__":
     app.run(debug=True)
         
