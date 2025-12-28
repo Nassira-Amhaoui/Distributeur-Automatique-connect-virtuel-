@@ -8,8 +8,9 @@
 {% block content %}
 <div class="page-header">
     <h2>Liste des Utilisateurs</h2>
+    <a href="{{ url_for('add_user') }}" class="btn-add">+ Ajouter un utilisateur</a>
 </div>
-<div class="user-card">
+<div class="table-card">
     <table class="user-table">
         <thead>
             <tr>
@@ -20,23 +21,63 @@
             </tr>
         </thead>
         <tbody>
-        {% for user in users %}
-        <tr>
-            <td>{{ user.Id_User }}</td>
-            <td>{{ user.UserName }}</td>
-            <td>{{ user.email }}</td>
-            <td>
-                <span class="role role-{{user.role}}"> {{ user.role }}</span>
-            </td>
-        </tr>
-        {%else%}
-        <tr>
-            <td colspan="4" class="empty-row">
-                Aucun utilisateur trouvé.
-            </td>
-        </tr>
-        {% endfor %}
+            {% for user in users %}
+            <tr class="user-row" data-id="{{ user.Id_User }}" data-username="{{ user.UserName }}" data-email="{{ user.email }}" data-role="{{ user.role }}">
+                <td>{{ user.Id_User }}</td>
+                <td>{{ user.UserName }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{user.role}}</td>
+            </tr>
+            {% endfor %}
         </tbody>
     </table>
 </div>
+<div id="userModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Détails de l'utilisateur</h2>
+        <form id="editUserForm" method="POST">
+            <input type="text" name="username" placeholder="Nom d'utilisateur" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <select name="role" required>
+                <option value="admin">Admin</option>
+                <option value="user">User</option>
+            </select>
+            <div class="modal-buttons">
+                <button type="submit" class="btn-edit">Modifier</button>
+                <button type="button" id="deletUserBtn" class="btn-delete">Supprimer</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+{%block js %}
+<script>
+    const modal = document.getElementById("userModal");
+    const closeBtn = modal.querySelector(".close");
+    const editForm = document.getElementById("editUserForm");
+    const deleteBtn = document.getElementById("deletUserBtn");
+    document.querySelectorAll('.user-row').forEach(row => {
+        row.addEventListener('click', () => {
+            editForm.username.value = row.dataset.username;
+            editForm.email.value = row.dataset.email;
+            editForm.role.value = row.dataset.role;
+            editForm.action = `/users/edit/${row.dataset.id}`;
+            deleteBtn.onclick = () => {
+                if (confirm("Voulez-vous vraiment supprimer cet utilisateur ?")) {
+                    fetch(`/users/delete/${row.dataset.id}`, {
+                        method: 'POST'
+                    }).then(response => 
+                    location.reload());
+                }
+            };
+            modal.style.display = "block";
+        });
+    });
+    closeBtn.onclick = () => 
+        modal.style.display = "none";
+        window.onclick = (event) => {
+        if (event.target == modal) modal.style.display = "none";
+    };
+</script>
 {% endblock %}

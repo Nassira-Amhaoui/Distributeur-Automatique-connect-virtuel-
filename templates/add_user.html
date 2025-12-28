@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Ajouter un utilisateur{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='add_user.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h2>Ajouter un utilisateur</h2>
+    <a href="{{ url_for('users') }}" class="btn-secondary">← Retour</a>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="flash flash-{{ category }}">
+        {{ message | safe }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<div class="table-card from-wrapper">
+    <form method="POST" class="user-form">
+        <div class="form-row">
+            <div class="form-group">
+            <label>Nom d'utilisateur</label>
+            <input type="text" name="username" required>
+            </div>
+            <div class="form-group">
+            <label>Email</label>
+            <input type="email" name="email" required>
+            </div>
+        <div class="form-group">
+            <label>Rôle</label>
+            <select name="role" required>
+                <option value="user">Utilisateur</option>
+                <option value="admin">Administrateur</option>
+            </select>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-add">Créer l'utilisateur</button>
+        </div>
+
+    </form>
+</div>
+
+{% endblock %}
+            

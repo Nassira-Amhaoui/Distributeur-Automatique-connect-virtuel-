@@ -1,6 +1,9 @@
 
 .page-header {
     margin-bottom: 25px;
+    align-items: center;
+    justify-content: space-between;
+    display: flex;
 }
 .page-header h1 {
     font-size: 24px;
@@ -11,11 +14,22 @@
     font-size: 14px;
     color: #64748b;
 }
-.user-card {
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+.table-card {
     background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    margin-top: 20px;
+}
+.btn-add {
+    float: right;
+    margin-bottom: 15px;
+    background: #2563eb;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
 }
 .user-table {
     width: 100%;
@@ -37,36 +51,68 @@
 .user-table tbody tr:hover {
     background: #f1f5f9;
 }
-.role{
-    padding: 6px 14px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 500;
-    text-transform: capitalize;
+.modal{
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    inset:0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-.role.admin {
-    background: #fee2e2;
-    color: #b91c1c;
+.modal-content{
+    background: white;
+    width: 420px;
+    margin: 90%;
+    margin: 100px auto;
+    padding: 25px;
+    border-radius: 10px;
+    box-sizing: border-box;
 }
-.role.user {
-    background: #dbeafe;
-    color: #1d4ed8;
-}
-.empty-row {
-    text-align: center;
-    padding: 30px;
-    color: #94a3b8;
-}
-.action-btn {
-    background: transparent;
-    border: none;
+.close{
+    float: right;
+    font-size: 20px;
     cursor: pointer;
-    font-size: 16px;
-    margin-right: 8px;
 }
-.action-edit {
-    color: #2563eb;
+#editUserForm{
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
 }
-.action-delete {
-    color: #dc2626;
+#editUserForm input, #editUserForm select{
+    display: block;
+    max-width: 100%;
+    margin-bottom: 14px;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    width: 100%;
+}
+.modal-button{
+    margin-top: 15px;
+    justify-content: space-between;
+    display: flex;
+}
+.btn-edit {
+    background: #22c55e;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+}
+.btn-delete{
+    background: #ef4444;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+}
+.user-row:hover{
+    background-color: #f1f4f6;
+}
+.modal-content form{
+    width: 100%;
 }
