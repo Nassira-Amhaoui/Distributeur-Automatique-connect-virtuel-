@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Distributeur</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <script src="https://kit.fontawesome.com/a2d9d6a64d.js" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/feather-icons"></script>
-
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Distributeur Automatique{% endblock %}</title>
+    
+    <!-- CSS Principal -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- Feather Icons UNIQUEMENT (pas FontAwesome) -->
+    <script src="https://unpkg.com/feather-icons"></script>
+    
+    {% block extra_css %}{% endblock %}
 </head>
 
 <body>
@@ -19,7 +23,6 @@
         <div class="logo">
             <div class="logo-box">DA</div>
             <span>Distributeur<br>Automatique</span>
-          
         </div>
 
         <nav class="menu">
@@ -40,9 +43,6 @@
             </a>
         </nav>
 
-
-
-
         <div class="user-box">
             <div class="avatar">AS</div>
             <div>
@@ -61,39 +61,37 @@
                 <i data-feather="search"></i>
                 <input type="text" id="productSearch" placeholder="Search...">
             </div>
-           
 
-        <div class="top-icons">
-           <div class="notification-wrapper" style="position: relative;" data-count="{{ produits_faible|length }}">
-                <i data-feather="bell" id="bell-icon"></i>
-                <span id="notif-badge" class="notif-badge"></span>
+            <div class="top-icons">
+                <!-- Notifications -->
+                <div class="notification-wrapper" style="position: relative;" data-count="{{ produits_faible|length }}">
+                    <i data-feather="bell" id="bell-icon"></i>
+                    <span id="notif-badge" class="notif-badge"></span>
 
-                <div id="notification-panel" class="notification-panel hidden">
-                    <h3>Notifications</h3>
-                    <ul>
-                        {% if produits_faible %}
-                            {% for p in produits_faible %}
-                                <li>⚠️ {{ p.Nom }} est presque épuisé ({{ p.Quantite }})</li>
-                            {% endfor %}
-                        {% else %}
-                            <li>Aucune nouvelle notification.</li>
-                        {% endif %}
-                    </ul>
+                    <div id="notification-panel" class="notification-panel">
+                        <h3>Notifications</h3>
+                        <ul>
+                            {% if produits_faible %}
+                                {% for p in produits_faible %}
+                                    <li>⚠️ {{ p.Nom }} est presque épuisé ({{ p.Quantite }})</li>
+                                {% endfor %}
+                            {% else %}
+                                <li>Aucune nouvelle notification.</li>
+                            {% endif %}
+                        </ul>
+                    </div>
                 </div>
+
+                <!-- Toggle Light/Dark -->
+                <label class="theme-toggle" id="themeToggle">
+                    <input type="checkbox" id="themeCheckbox">
+                    <span class="icon sun">☀️</span>
+                    <span class="icon moon">🌙</span>
+                    <span class="toggle-circle"></span>
+                </label>
+
+                <img src="https://ui-avatars.com/api/?name=Admin+User&background=6366f1&color=fff" class="admin-img" alt="Admin">
             </div>
-
-
-            <!-- Toggle Light/Dark -->
-            <label class="theme-toggle" id="themeToggle">
-                <input type="checkbox" id="themeCheckbox">
-                <span class="toggle-circle"></span>
-                <span class="icon sun">☀️</span>
-                <span class="icon moon">🌙</span>
-            </label>
-
-            <img src="https://via.placeholder.com/36" class="admin-img">
-        </div>
-
         </header>
 
         <section class="page-content">
@@ -101,73 +99,111 @@
         </section>
     </main>
 </div>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-    const menuItems = document.querySelectorAll('.menu a');
 
+<!-- Scripts à la fin du body pour optimisation -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // ========================================
+    // INITIALISATION DES ICÔNES FEATHER
+    // ========================================
+    if (typeof feather !== 'undefined') {
+        feather.replace();
+    }
+
+    // ========================================
+    // GESTION DU MENU ACTIF
+    // ========================================
+    const menuItems = document.querySelectorAll('.menu a');
     menuItems.forEach(item => {
         item.addEventListener('click', function(e) {
-            // Supprimer "selected" de tous les éléments
             menuItems.forEach(i => i.classList.remove('selected'));
-
-            // Ajouter "selected" à l'élément cliqué
             this.classList.add('selected');
         });
     });
-});
 
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    // Remplacer les icônes Feather
-    feather.replace();
-
-    // Notifications
+    // ========================================
+    // GESTION DES NOTIFICATIONS
+    // ========================================
     const bellWrapper = document.querySelector('.notification-wrapper');
-    const bellIcon = bellWrapper.querySelector('svg');
     const notifPanel = document.getElementById("notification-panel");
     const notifBadge = document.getElementById("notif-badge");
 
-    const notifWrapper = document.getElementById("notif-wrapper");
+    if (bellWrapper && notifPanel && notifBadge) {
+        let count = parseInt(bellWrapper.dataset.count) || 0;
 
-    let count = parseInt(bellWrapper.dataset.count) || 0;
+        // Afficher le badge si notifications
+        if (count > 0) {
+            notifBadge.textContent = count;
+            notifBadge.style.display = "flex";
+        } else {
+            notifBadge.style.display = "none";
+        }
 
-    if(count > 0){
-        notifBadge.textContent = count;
-        notifBadge.style.display = "flex"; // centré
-    } else {
-        notifBadge.style.display = "none";
-    }
-
-     // Toggle affichage panel notifications
-    if(bellIcon){
-        bellIcon.addEventListener("click", (e) => {
+        // Toggle du panel de notifications
+        bellWrapper.addEventListener("click", function(e) {
             e.stopPropagation();
-            notifPanel.classList.toggle("show"); // <-- ici on toggle "show"
-            notifBadge.style.display = "none";   // cache le badge quand ouvert
+            notifPanel.classList.toggle("show");
+            
+            // Cacher le badge quand ouvert
+            if (notifPanel.classList.contains("show")) {
+                notifBadge.style.display = "none";
+            }
+        });
+
+        // Fermer le panel en cliquant ailleurs
+        document.addEventListener("click", function(e) {
+            if (!notifPanel.contains(e.target) && !bellWrapper.contains(e.target)) {
+                notifPanel.classList.remove("show");
+            }
         });
     }
 
-    // Clic en dehors pour fermer le panel
-    document.addEventListener("click", (e) => {
-        if (!notifPanel.contains(e.target) && e.target !== bellIcon) {
-            notifPanel.classList.remove("show"); // retire "show"
+    // ========================================
+    // THEME TOGGLE (DARK/LIGHT)
+    // ========================================
+    const themeCheckbox = document.getElementById("themeCheckbox");
+    
+    if (themeCheckbox) {
+        // Charger le thème sauvegardé
+        try {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark');
+                themeCheckbox.checked = true;
+            }
+        } catch (e) {
+            console.log('localStorage non disponible, thème par défaut utilisé');
         }
-    });
 
+        // Toggle du thème
+        themeCheckbox.addEventListener("change", function() {
+            if (this.checked) {
+                document.body.classList.add("dark");
+                try {
+                    localStorage.setItem('theme', 'dark');
+                } catch (e) {
+                    // Ignore si localStorage bloqué
+                }
+            } else {
+                document.body.classList.remove("dark");
+                try {
+                    localStorage.setItem('theme', 'light');
+                } catch (e) {
+                    // Ignore si localStorage bloqué
+                }
+            }
+        });
+    }
 
-    // Theme toggle
-    const themeSwitch = document.getElementById("themeCheckbox");
-    themeSwitch.addEventListener("change", () => {
-        document.body.classList.toggle("dark");
-    });
- // Theme toggle
-   
-    // Recherche produit (si tableau existe)
+    // ========================================
+    // RECHERCHE DE PRODUITS
+    // ========================================
     const searchInput = document.getElementById('productSearch');
     const table = document.querySelector('.products-table tbody');
-    if(table){
-        const rows = table.querySelectorAll('tr');
+    
+    if (searchInput && table) {
+        const rows = table.querySelectorAll('tr:not(.no-match)');
+        
         searchInput.addEventListener('input', function() {
             const filter = this.value.toLowerCase();
             let hasVisible = false;
@@ -175,31 +211,38 @@ document.addEventListener("DOMContentLoaded", function() {
             rows.forEach(row => {
                 const cells = row.querySelectorAll('td');
                 let match = false;
+                
                 cells.forEach(cell => {
-                    if(cell.textContent.toLowerCase().includes(filter)){
+                    if (cell.textContent.toLowerCase().includes(filter)) {
                         match = true;
                     }
                 });
+                
                 row.style.display = match ? '' : 'none';
-                if(match) hasVisible = true;
+                if (match) hasVisible = true;
             });
 
+            // Gestion du message "Aucun résultat"
             let emptyRow = table.querySelector('.no-match');
-            if(!hasVisible){
-                if(!emptyRow){
+            
+            if (!hasVisible && filter !== '') {
+                if (!emptyRow) {
                     const tr = document.createElement('tr');
                     tr.classList.add('no-match');
-                    tr.innerHTML = `<td colspan="4">Aucun produit trouvé.</td>`;
+                    tr.innerHTML = `<td colspan="4" style="text-align:center; padding:20px;">Aucun produit trouvé.</td>`;
                     table.appendChild(tr);
                 }
             } else {
-                if(emptyRow) emptyRow.remove();
+                if (emptyRow) emptyRow.remove();
             }
         });
     }
+
+    console.log('Application initialisée avec succès');
 });
 </script>
 
+{% block extra_js %}{% endblock %}
 
 </body>
 </html>
