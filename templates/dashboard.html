@@ -1,0 +1,332 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard">
+
+    <!-- Section En-tête avec salutation -->
+    <div class="dashboard-header">
+        <div>
+            <h1>Tableau de bord</h1>
+            <p class="subtitle">Vue d'ensemble de votre système de distribution</p>
+        </div>
+        <div class="date-display">
+            <i data-feather="calendar"></i>
+            <span id="currentDate"></span>
+        </div>
+    </div>
+
+    <!-- Section KPIs -->
+    <div class="kpi-cards">
+        <div class="kpi-card primary">
+            <div class="kpi-content">
+                <div class="kpi-info">
+                    <h3>Total Distributeurs</h3>
+                    <p class="kpi-value">{{ total_distributeurs }}</p>
+                    <span class="kpi-label">Actifs</span>
+                </div>
+                <div class="kpi-icon-wrapper">
+                    <i data-feather="cpu" class="kpi-icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="kpi-card success">
+            <div class="kpi-content">
+                <div class="kpi-info">
+                    <h3>Total Produits</h3>
+                    <p class="kpi-value">{{ total_produits }}</p>
+                    <span class="kpi-label">En inventaire</span>
+                </div>
+                <div class="kpi-icon-wrapper">
+                    <i data-feather="package" class="kpi-icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="kpi-card warning">
+            <div class="kpi-content">
+                <div class="kpi-info">
+                    <h3>Stock Faible</h3>
+                    <p class="kpi-value">{{ produits_faible|length }}</p>
+                    <span class="kpi-label">Produits</span>
+                </div>
+                <div class="kpi-icon-wrapper">
+                    <i data-feather="alert-triangle" class="kpi-icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="kpi-card revenue">
+            <div class="kpi-content">
+                <div class="kpi-info">
+                    <h3>Revenus Totaux</h3>
+                    <p class="kpi-value">{{ "%.2f"|format(total_revenus) }} DH</p>
+                    <span class="kpi-label">Ce mois: {{ "%.2f"|format(revenus_mois) }} DH</span>
+                </div>
+                <div class="kpi-icon-wrapper">
+                    <i data-feather="dollar-sign" class="kpi-icon"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Graphiques principaux -->
+    <div class="charts-row">
+        <div class="chart-card large">
+            <div class="chart-header">
+                <h3>Évolution des ventes (7 derniers jours)</h3>
+                <div class="chart-actions">
+                    <button class="chart-btn active" data-chart="revenue">Revenus</button>
+                    <button class="chart-btn" data-chart="quantity">Quantités</button>
+                </div>
+            </div>
+            <canvas id="timelineChart"></canvas>
+        </div>
+
+        <div class="chart-card medium">
+            <div class="chart-header">
+                <h3>Top 5 Produits</h3>
+            </div>
+            <canvas id="salesChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Section Produits et Stock -->
+    <div class="info-row">
+        <!-- Produits populaires -->
+        <div class="popular-products">
+            <h3>Produits les plus vendus</h3>
+            <div class="products-grid">
+                {% for p in produits_populaires %}
+                <div class="product-card-mini">
+                    <div class="product-image">
+                        {% if p.Image_URL %}
+                        <img src="{{ p.Image_URL }}" alt="{{ p.Nom }}">
+                        {% else %}
+                        <div class="product-placeholder">
+                            <i data-feather="box"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="product-details">
+                        <h4>{{ p.Nom }}</h4>
+                        <p class="product-price">{{ p.Prix }} DH</p>
+                        <p class="product-sales">{{ p.total_ventes }} vendus</p>
+                        <div class="product-stock">
+                            <i data-feather="package"></i>
+                            <span>Stock: {{ p.Quantite }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Graphique stock -->
+        <div class="chart-card medium">
+            <div class="chart-header">
+                <h3>Niveau de stock</h3>
+            </div>
+            <canvas id="stockChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Section Alertes -->
+    <div class="alerts-section">
+        <div class="alerts-header">
+            <h3><i data-feather="alert-circle"></i> Alertes de stock</h3>
+            <span class="alert-count">{{ produits_faible|length }} produit(s)</span>
+        </div>
+        {% if produits_faible %}
+        <div class="alerts-grid">
+            {% for p in produits_faible %}
+            <div class="alert-card {% if p.Quantite == 0 %}critical{% elif p.Quantite <= 2 %}danger{% else %}warning{% endif %}">
+                <div class="alert-icon">
+                    {% if p.Quantite == 0 %}
+                    <i data-feather="x-circle"></i>
+                    {% else %}
+                    <i data-feather="alert-triangle"></i>
+                    {% endif %}
+                </div>
+                <div class="alert-content">
+                    <h4>{{ p.Nom }}</h4>
+                    <p>Emplacement: {{ p.Emplacement }}</p>
+                    <div class="alert-footer">
+                        <span class="stock-badge">{{ p.Quantite }} unités</span>
+                        <span class="alert-status">
+                            {% if p.Quantite == 0 %}Rupture totale{% elif p.Quantite <= 2 %}Critique{% else %}Faible{% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-alerts">
+            <i data-feather="check-circle"></i>
+            <p>Aucun produit en rupture. Tous les stocks sont suffisants.</p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- Données pour les graphiques -->
+<div id="__dashboardData" data-json='{{ dashboard_data | tojson | safe }}'></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    // Afficher la date actuelle
+    const dateDisplay = document.getElementById('currentDate');
+    const today = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    dateDisplay.textContent = today.toLocaleDateString('fr-FR', options);
+
+    // Remplacer les icônes Feather
+    feather.replace();
+
+    // Récupérer les données
+    const dataContainer = document.getElementById("__dashboardData");
+    const rawData = JSON.parse(dataContainer.dataset.json);
+
+    // Graphique temporel (revenus/quantités)
+    const timelineCtx = document.getElementById('timelineChart').getContext('2d');
+    const timelineChart = new Chart(timelineCtx, {
+        type: 'line',
+        data: {
+            labels: rawData.timeline.labels,
+            datasets: [{
+                label: 'Revenus (DH)',
+                data: rawData.timeline.revenus,
+                borderColor: '#4f46e5',
+                backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                tension: 0.4,
+                fill: true,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: '#4f46e5',
+                    borderWidth: 1
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                },
+                x: {
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+
+    // Basculer entre revenus et quantités
+    const chartBtns = document.querySelectorAll('.chart-btn');
+    chartBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            chartBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            const chartType = this.dataset.chart;
+            if (chartType === 'revenue') {
+                timelineChart.data.datasets[0].data = rawData.timeline.revenus;
+                timelineChart.data.datasets[0].label = 'Revenus (DH)';
+            } else {
+                timelineChart.data.datasets[0].data = rawData.timeline.quantites;
+                timelineChart.data.datasets[0].label = 'Quantités vendues';
+            }
+            timelineChart.update();
+        });
+    });
+
+    // Graphique ventes (bar chart horizontal)
+    const salesCtx = document.getElementById('salesChart').getContext('2d');
+    new Chart(salesCtx, {
+        type: 'bar',
+        data: {
+            labels: rawData.ventes.labels,
+            datasets: [{
+                label: 'Ventes',
+                data: rawData.ventes.data,
+                backgroundColor: [
+                    '#4f46e5',
+                    '#7c3aed',
+                    '#2563eb',
+                    '#0891b2',
+                    '#059669'
+                ],
+                borderRadius: 6,
+                barThickness: 30
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                },
+                y: {
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+
+    // Graphique stock (doughnut)
+    const stockCtx = document.getElementById('stockChart').getContext('2d');
+    new Chart(stockCtx, {
+        type: 'doughnut',
+        data: {
+            labels: rawData.stock.labels,
+            datasets: [{
+                data: rawData.stock.data,
+                backgroundColor: [
+                    '#4f46e5',
+                    '#7c3aed',
+                    '#2563eb',
+                    '#0891b2',
+                    '#059669',
+                    '#f59e0b',
+                    '#ef4444'
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        font: { size: 11 }
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+
+{% endblock %}
