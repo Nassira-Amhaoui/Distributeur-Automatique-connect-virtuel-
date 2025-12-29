@@ -1,11 +1,37 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from itsdangerous import URLSafeTimedSerializer
 from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
+from flask import session
 import pymysql
 import secrets
 app = Flask(__name__)
 app.secret_key='votre_cle_secrete'
 serializer= URLSafeTimedSerializer(app.secret_key)
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            flash("Veuillez vous connecter pour accéder à cette page.")
+            return redirect(url_for('login_page'))
+        return f(*args, **kwargs)
+    return decorated_function
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            flash("Veuillez vous connecter pour accéder à cette page.")
+            return redirect(url_for('login_page'))
+        if session.get('role') != 'admin':
+            flash("Accès refusé. Vous n'avez pas les permissions nécessaires.")
+            return redirect(url_for('dashboard'))
+        return f(*args, **kwargs)
+    return decorated_function
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash("Vous avez été déconnecté avec succès.")
+    return redirect(url_for('login_page'))
 def get_db_connection():
     return pymysql.connect(
         host="localhost",
@@ -77,14 +103,20 @@ def authentificate():
         cursor.close()
         conn.close()
     if user and check_password_hash(user['password'], password):
+        session['user_id'] = user['Id_User']
+        session['username'] = user['UserName']
+        session['role'] = user['role']
         return redirect(url_for('dashboard'))
     else:
         flash( "Email ou mot de passe incorrect!")
         return redirect(url_for('login_page'))
 @app.route('/dashboard')
+@login_required
 def dashboard():
     return render_template('dashboard.html')
 @app.route('/users')
+@login_required
+@admin_required
 def users():
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -100,9 +132,16 @@ def produits():
 def analytics():
     return render_template('analytics.html')
 @app.route('/settings')
+@login_required
+@admin_required
 def settings():
+    if request.method == 'POST':
+        flash("Paramètres mis à jour avec succès!")
+        return redirect(url_for('settings'))
     return render_template('settings.html')
 @app.route('/users/add', methods=['GET', 'POST'])
+@login_required
+@admin_required
 def add_user():
     if request.method == 'POST':
         username = request.form.get('username')

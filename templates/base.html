@@ -12,7 +12,16 @@
 </head>
 
 <body>
-
+<!-- Flash message -->
+    <div class="flash-messages-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message|safe }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+</div>
 <div class="layout">
 
     <!-- Sidebar -->
@@ -31,8 +40,11 @@
             </a>
 
             <a href="{{ url_for('analytics') }}"><i data-feather="pie-chart"></i> Analytics</a>
+            {% if session.get('role') == 'admin' %}
             <a href="{{ url_for('users') }}"><i data-feather="users"></i> Users</a>
             <a href="{{ url_for('settings') }}"><i data-feather="settings"></i> Settings</a>
+            {% endif %}
+        
         </nav>
 
 
@@ -40,8 +52,8 @@
         <div class="user-box">
             <div class="avatar">AS</div>
             <div>
-                <p class="name">Admin User</p>
-                <p class="email">admin@example.com</p>
+                <p class="name">{{ session.get('username') }}</p>
+                <p class="email">{{ session.get('email') }} - {{ session.get('role') }}</p>
             </div>
         </div>
     </aside>
@@ -55,6 +67,7 @@
                 <i data-feather="search"></i>
                 <input type="text" id="productSearch" placeholder="Search...">
             </div>
+            
             <!-- Notification Panel -->
             <div id="notification-panel" class="notification-panel hidden">
                 <h3>Notifications</h3>
@@ -79,6 +92,8 @@
 
 
                 <img src="https://via.placeholder.com/36" class="admin-img">
+                <!-- boutton logout -->
+                <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
             </div>
         </header>
         <section class="page-content">
@@ -158,6 +173,14 @@ document.addEventListener("click", (e) => {
         notifPanel.classList.add("hidden");
     }
 });
+</script>
+<script>
+setTimeout(() => {
+    document.querySelectorAll('.flash').forEach(flash => {
+        flash.style.opacity = '0';
+        setTimeout(() => flash.remove(), 400);
+    });
+}, 4000);
 </script>
 
 {% block js %}{% endblock %}
