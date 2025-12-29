@@ -1173,6 +1173,7 @@ body.dark .topbar {
 /* Context menu moderne - CORRIGÉ */
 .context-menu {
     position: absolute;
+    display: none;
     background: var(--bg-card);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-xl);
@@ -1204,16 +1205,18 @@ body.dark .topbar {
 
 /* Modal moderne - CORRIGÉ */
 .modal {
-    display: none;
+    display: none;                /* caché par défaut */
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(8px);
     z-index: 3000;
+
     align-items: center;
     justify-content: center;
     padding: 1rem;
 }
+
 
 .modal.show {
     display: flex;
@@ -1740,4 +1743,12 @@ body.dark .topbar {
     .menu-toggle {
         display: flex;
     }
+}
+
+
+.modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
