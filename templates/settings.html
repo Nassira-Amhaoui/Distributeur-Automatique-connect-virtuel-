@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='settings.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+
+  <h2 class="settings-title">Paramètres</h2>
+
+  <!-- ===== TABS ===== -->
+  <div class="settings-tabs">
+    <button class="tab-btn active" data-tab="profile">Profil</button>
+    <button class="tab-btn" data-tab="security">Sécurité</button>
+    <button class="tab-btn" data-tab="preferences">Préférences</button>
+
+    {% if session.get('role') == 'admin' %}
+      <button class="tab-btn" data-tab="admin">Administration</button>
+    {% endif %}
+  </div>
+
+  <!-- ===== PROFIL ===== -->
+  <div class="tab-section active" id="profile">
+    <h3>Informations du profil</h3>
+
+    <div class="form-group">
+      <label>Nom d'utilisateur</label>
+      <input type="text" value="{{ session.get('username') }}" disabled>
+    </div>
+
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" value="{{ session.get('email') or '' }}">
+    </div>
+
+    <div class="form-group">
+      <label>Rôle</label>
+      <input type="text" value="{{ session.get('role') }}" disabled>
+    </div>
+  </div>
+
+  <!-- ===== SECURITY ===== -->
+  <div class="tab-section" id="security">
+  <h3>Sécurité du compte</h3>
+
+  <form method="POST" action="{{ url_for('change_password') }}">
+
+    <div class="form-group">
+      <label for="current_password">Ancien mot de passe</label>
+      <input 
+        type="password" 
+        id="current_password"
+        name="current_password"
+        required
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="new_password">Nouveau mot de passe</label>
+      <input 
+        type="password" 
+        id="new_password"
+        name="new_password"
+        required
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="confirm_password">Confirmer le mot de passe</label>
+      <input 
+        type="password" 
+        id="confirm_password"
+        name="confirm_password"
+        required
+      >
+    </div>
+
+    <button type="submit" class="primary-btn">
+      Modifier le mot de passe
+    </button>
+
+  </form>
+</div>
+  <!-- ===== PREFERENCES ===== -->
+  <div class="tab-section" id="preferences">
+    <h3>Préférences</h3>
+
+    <form method="POST" action="{{ url_for('update_preferences') }}">
+
+        <!-- LANGUE -->
+        <div class="form-group">
+            <label for="language">Langue</label>
+            <select name="language" id="language">
+                <option value="fr" {% if session.get('language') == 'fr' %}selected{% endif %}>
+                    Français
+                </option>
+                <option value="en" {% if session.get('language') == 'en' %}selected{% endif %}>
+                    English
+                </option>
+            </select>
+        </div>
+
+        <!-- THÈME -->
+        <div class="form-group">
+            <label for="theme">Thème</label>
+            <select name="theme" id="theme">
+                <option value="light" {% if session.get('theme') == 'light' %}selected{% endif %}>
+                    Clair
+                </option>
+                <option value="dark" {% if session.get('theme') == 'dark' %}selected{% endif %}>
+                    Sombre
+                </option>
+            </select>
+        </div>
+
+        <button type="submit" class="primary-btn">
+            Enregistrer les préférences
+        </button>
+    </form>
+</div>
+  <!-- ===== ADMIN ===== -->
+    {% if session.get('role') == 'admin' %}
+  <div class="tab-section" id="admin">
+    <h3>Administration</h3>
+    <p>Accès réservé à l’administrateur.</p>
+
+    <a href="{{ url_for('users') }}" class="primary-btn">
+      Gérer les utilisateurs
+    </a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const tabs = document.querySelectorAll(".tab-btn");
+  const sections = document.querySelectorAll(".tab-section");
+
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      tabs.forEach(t => t.classList.remove("active"));
+      sections.forEach(s => s.classList.remove("active"));
+
+      tab.classList.add("active");
+      document.getElementById(tab.dataset.tab).classList.add("active");
+    });
+  });
+});
+</script>
+{% endblock %}

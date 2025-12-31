@@ -11,7 +11,7 @@
 
 </head>
 
-<body>
+<body class="{{ session.get('theme', 'light')}}">
 <!-- Flash message -->
     <div class="flash-messages-container">
     {% with messages = get_flashed_messages(with_categories=true) %}

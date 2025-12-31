@@ -27,6 +27,7 @@ def admin_required(f):
             return redirect(url_for('dashboard'))
         return f(*args, **kwargs)
     return decorated_function
+# logout route
 @app.route('/logout')
 def logout():
     session.clear()
@@ -44,9 +45,11 @@ def get_db_connection():
 @app.route('/')
 def index():
     return redirect('/login')
+# login route
 @app.route('/login', methods=['GET'])
 def login_page():
     return render_template('login.html')
+# forgot password route
 @app.route('/forget_password', methods=['GET', 'post'])
 def forget_password():
     reset_link = None
@@ -64,6 +67,7 @@ def forget_password():
             reset_link = url_for('reset_password', token=token, _external=True)
             flash("Un lien de réinitialisation du mot de passe a été envoyé à votre adresse email.")
     return render_template('forget_password.html', reset_link=reset_link)
+# reset password route
 @app.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     try:
@@ -87,6 +91,7 @@ def reset_password(token):
         flash("Mot de passe modifié avec succès!")
         return redirect(url_for('login_page'))
     return render_template('reset_password.html', email=email, token=token)
+# authentification route
 @app.route('/authentification', methods=['POST'])
 def authentificate():
     email = request.form.get('email')
@@ -105,15 +110,18 @@ def authentificate():
     if user and check_password_hash(user['password'], password):
         session['user_id'] = user['Id_User']
         session['username'] = user['UserName']
+        session['email'] = user['email']
         session['role'] = user['role']
         return redirect(url_for('dashboard'))
     else:
         flash( "Email ou mot de passe incorrect!")
         return redirect(url_for('login_page'))
+# dashboard route
 @app.route('/dashboard')
 @login_required
 def dashboard():
     return render_template('dashboard.html')
+# users management route
 @app.route('/users')
 @login_required
 @admin_required
@@ -125,12 +133,16 @@ def users():
     cursor.close()
     conn.close()
     return render_template('users.html', users=users)
+# products route
 @app.route('/produits')
 def produits():
     return render_template('produits.html')
+# analytics route
 @app.route('/analytics')
 def analytics():
     return render_template('analytics.html')
+# settings route
+
 @app.route('/settings')
 @login_required
 @admin_required
@@ -139,6 +151,77 @@ def settings():
         flash("Paramètres mis à jour avec succès!")
         return redirect(url_for('settings'))
     return render_template('settings.html')
+
+# update profile route
+@app.route('/settings/update_profile', methods=['POST'])
+@login_required
+def update_profile():
+    username = request.form.get('username')
+    email = request.form.get('email')
+    flash("Profil mis à jour avec succès", "success")
+    return redirect(url_for('settings'))
+# change password route
+@app.route('/settings/change_password', methods=['POST'])
+@login_required
+def change_password():
+    current = request.form.get('current_password')
+    new = request.form.get('new_password')
+    confirm = request.form.get('confirm_password')
+
+    if not current or not new or not confirm:
+        flash("Tous les champs sont obligatoires", "error")
+        return redirect(url_for('settings'))
+
+    if new != confirm:
+        flash("Les mots de passe ne correspondent pas", "error")
+        return redirect(url_for('settings'))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT password FROM utilisateurs WHERE Id_User = %s",
+        (session['user_id'],)
+    )
+    user = cursor.fetchone()
+
+    if not user or not check_password_hash(user['password'], current):
+        flash("Mot de passe actuel incorrect", "error")
+        conn.close()
+        return redirect(url_for('settings'))
+
+    hashed = generate_password_hash(new)
+    cursor.execute(
+        "UPDATE utilisateurs SET password = %s WHERE Id_User = %s",
+        (hashed, session['user_id'])
+    )
+    conn.commit()
+    conn.close()
+
+    flash("Mot de passe modifié avec succès", "success")
+    return redirect(url_for('settings'))
+# preferences route
+@app.route('/settings/preferences', methods=['POST'])
+@login_required
+def update_preferences():
+    language = request.form.get('language')
+    theme = request.form.get('theme')
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "UPDATE utilisateurs SET language = %s, theme = %s WHERE Id_User = %s",
+        (language, theme, session['user_id'])
+    )
+    conn.commit()
+    conn.close()
+
+    session['language'] = language 
+    session['theme'] = theme
+
+    flash("Préférences mises à jour avec succés", "success")
+    return redirect(url_for('settings'))
+
 @app.route('/users/add', methods=['GET', 'POST'])
 @login_required
 @admin_required
