@@ -17,18 +17,6 @@
 
     <!-- Section KPIs -->
     <div class="kpi-cards">
-        <div class="kpi-card primary">
-            <div class="kpi-content">
-                <div class="kpi-info">
-                    <h3>Total Distributeurs</h3>
-                    <p class="kpi-value">{{ total_distributeurs }}</p>
-                    <span class="kpi-label">Actifs</span>
-                </div>
-                <div class="kpi-icon-wrapper">
-                    <i data-feather="cpu" class="kpi-icon"></i>
-                </div>
-            </div>
-        </div>
 
         <div class="kpi-card success">
             <div class="kpi-content">
@@ -82,19 +70,7 @@
             </div>
             <canvas id="timelineChart"></canvas>
         </div>
-
-        <div class="chart-card medium">
-            <div class="chart-header">
-                <h3>Top 5 Produits</h3>
-            </div>
-            <canvas id="salesChart"></canvas>
-        </div>
-    </div>
-
-    <!-- Section Produits et Stock -->
-    <div class="info-row">
-        <!-- Produits populaires -->
-        <div class="popular-products">
+         <div class="popular-products">
             <h3>Produits les plus vendus</h3>
             <div class="products-grid">
                 {% for p in produits_populaires %}
@@ -120,53 +96,9 @@
                 </div>
                 {% endfor %}
             </div>
-        </div>
 
-        <!-- Graphique stock -->
-        <div class="chart-card medium">
-            <div class="chart-header">
-                <h3>Niveau de stock</h3>
-            </div>
-            <canvas id="stockChart"></canvas>
-        </div>
-    </div>
-
-    <!-- Section Alertes -->
-    <div class="alerts-section">
-        <div class="alerts-header">
-            <h3><i data-feather="alert-circle"></i> Alertes de stock</h3>
-            <span class="alert-count">{{ produits_faible|length }} produit(s)</span>
-        </div>
-        {% if produits_faible %}
-        <div class="alerts-grid">
-            {% for p in produits_faible %}
-            <div class="alert-card {% if p.Quantite == 0 %}critical{% elif p.Quantite <= 2 %}danger{% else %}warning{% endif %}">
-                <div class="alert-icon">
-                    {% if p.Quantite == 0 %}
-                    <i data-feather="x-circle"></i>
-                    {% else %}
-                    <i data-feather="alert-triangle"></i>
-                    {% endif %}
-                </div>
-                <div class="alert-content">
-                    <h4>{{ p.Nom }}</h4>
-                    <p>Emplacement: {{ p.Emplacement }}</p>
-                    <div class="alert-footer">
-                        <span class="stock-badge">{{ p.Quantite }} unités</span>
-                        <span class="alert-status">
-                            {% if p.Quantite == 0 %}Rupture totale{% elif p.Quantite <= 2 %}Critique{% else %}Faible{% endif %}
-                        </span>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="no-alerts">
-            <i data-feather="check-circle"></i>
-            <p>Aucun produit en rupture. Tous les stocks sont suffisants.</p>
-        </div>
-        {% endif %}
+       
+    </div>        
     </div>
 
 </div>
