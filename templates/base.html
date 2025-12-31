@@ -33,23 +33,36 @@
                 <i data-feather="package"></i> Produits
             </a>
             <a href="{{ url_for('product_history') }}" class="{% if active=='product_history' %}active{% endif %}">
-                <i data-feather="pie-chart"></i> Analytics
+                <i data-feather="pie-chart"></i> Hystorique
             </a>
             <a href="{{ url_for('users') }}" class="{% if active=='users' %}active{% endif %}">
-                <i data-feather="users"></i> Users
+                <i data-feather="users"></i> Utilisateur
             </a>
             <a href="{{ url_for('settings') }}" class="{% if active=='settings' %}active{% endif %}">
-                <i data-feather="settings"></i> Settings
+                <i data-feather="settings"></i> Paramétres
+            </a>
+            <a href="{{ url_for('logout') }}" class="{% if active=='logout' %}active{% endif %}">
+                <i data-feather="log-out"></i> Logout
             </a>
         </nav>
 
         <div class="user-box">
-            <div class="avatar">AS</div>
-            <div>
-                <p class="name">Admin User</p>
-                <p class="email">admin@example.com</p>
-            </div>
+    {% if current_user %}
+        <div class="avatar">
+            {{ current_user.UserName[0]|upper }}{{ current_user.UserName.split()[1][0]|upper if current_user.UserName.split()|length > 1 else current_user.UserName[1]|upper }}
         </div>
+        <div>
+            <p class="name">{{ current_user.UserName }}</p>
+            <p class="email">{{ current_user.email }}</p>
+        </div>
+    {% else %}
+        <div class="avatar">?</div>
+        <div>
+            <p class="name">Invité</p>
+            <p class="email">Non connecté</p>
+        </div>
+    {% endif %}
+</div>
     </aside>
 
     <!-- Content area -->
@@ -89,8 +102,6 @@
                     <span class="icon moon">🌙</span>
                     <span class="toggle-circle"></span>
                 </label>
-
-                <img src="https://ui-avatars.com/api/?name=Admin+User&background=6366f1&color=fff" class="admin-img" alt="Admin">
             </div>
         </header>
 
