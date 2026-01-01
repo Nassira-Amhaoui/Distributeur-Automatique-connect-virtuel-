@@ -1,81 +1,190 @@
-body{
-            font-family: Arial, sans-serif;
-            background: linear-gradient(to bottom, #e8f4ff, #ffffff);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items:center;
-            margin: 0;
-       }
-        .reset-container{
-            width: 380px;
-            background: #ffffff;
-            width: 70px;
-            height: 70px;
-            margin: 0 auto 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-       }
-       .reset-icon{
-            width: 75px;
-            height: 75px;
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.6);
-            display: block;
-            justify-content: center;
-            align-items: center;
-            margin: 0 auto 20px;
-            object-fit: contain;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.18);
-            padding: 10px;
-        }
-        .reset-icon img{
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-        h2{
-            margin-bottom: 10px;
-            font-size: 22px;  
-        }  
-        .subtitle{
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 25px;
-        }
-        input{
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: 1px solid #ddd;
-            background: #f7f9fc;
-            margin-bottom: 12px;
-            box-sizing: border-box;
-        }
-        button{
-            width: 100%;
-            margin-top: 20px;
-            padding: 12px;
-            background: #2563eb;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            color: white;
-            cursor: pointer;
-        }
-        button:hover{
-            background-color: #1565c0;
-        }
-        .back-link{
-            display: block;
-            margin-top: 20px;
-            font-size: 13px;
-            color: #2563eb;
-            text-decoration: none;
-        }
-        .back-link:hover{
-            text-decoration: underline;
-        }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #a8d8ff 0%, #e0f2ff 50%, #c9e6ff 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.reset-password-container {
+  background: white;
+  padding: 50px 50px 40px;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 450px;
+  text-align: center;
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+/* Icône de réinitialisation */
+.reset-icon {
+  margin-bottom: 25px;
+}
+
+.reset-icon img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: block;
+  margin: 0 auto;
+  object-fit: cover;
+  border: 3px solid #0575e6;
+}
+
+/* Titre */
+.reset-password-container h2 {
+  font-size: 28px;
+  color: #333;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+/* Sous-titre */
+.subtitle {
+  color: #666;
+  margin-bottom: 30px;
+  font-size: 14px;
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* Formulaire */
+.reset-password-container form {
+  width: 100%;
+}
+
+/* Inputs */
+.reset-password-container input[type="password"] {
+  width: 100%;
+  padding: 16px;
+  margin-bottom: 20px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 15px;
+  outline: none;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.reset-password-container input[type="password"]:focus {
+  border-color: #0575e6;
+  box-shadow: 0 0 0 3px rgba(5, 117, 230, 0.1);
+}
+
+.reset-password-container input[type="password"]::placeholder {
+  color: #999;
+  font-size: 15px;
+}
+
+/* Espacement entre les inputs */
+.reset-password-container input[type="password"]:first-of-type {
+  margin-bottom: 20px;
+}
+
+.reset-password-container input[type="password"]:last-of-type {
+  margin-bottom: 25px;
+}
+
+/* Bouton de soumission */
+.reset-password-container button[type="submit"] {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #0575e6 0%, #021b79 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(5, 117, 230, 0.4);
+  margin-bottom: 15px;
+}
+
+.reset-password-container button[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(5, 117, 230, 0.5);
+}
+
+.reset-password-container button[type="submit"]:active {
+  transform: translateY(0);
+}
+
+/* Messages flash */
+.reset-password-container p[style*="color: red"] {
+  background: #fee;
+  color: #c33 !important;
+  border: 1px solid #fcc;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+/* Message de succès (si nécessaire) */
+.success-message {
+  background: #efe;
+  color: #3c3;
+  border: 1px solid #cfc;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+/* Lien de retour */
+.back-link {
+  display: inline-block;
+  margin-top: 15px;
+  color: #0575e6;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.3s ease;
+}
+
+.back-link:hover {
+  color: #045bb5;
+  text-decoration: underline;
+}
+
+/* Animation d'entrée */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  body {
+    padding: 10px;
+  }
+
+  .reset-password-container {
+    padding: 40px 30px;
+  }
+
+  .reset-password-container h2 {
+    font-size: 24px;
+  }
+
+  .reset-icon img {
+    width: 70px;
+    height: 70px;
+  }
+}

@@ -9,27 +9,84 @@
     <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
 </head>
 <body>
-    <div class="login-container">
-        <img class="login-icon" src="{{ url_for('static', filename='login.jpeg')}}" alt="login icon">
-        <h2>connecter-vous avec email</h2>
-        <p class= "subtitle">Gérez vos stocks. C'est simple et facile.</p>
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <p style="color: red; font-size: 14px; margin-bottom: 10px;">{{ messages[0] }}</p>
-            {% endif %}
-        {% endwith %}
-        <form method="POST" action="/authentification">
-            <input type="email" name="email" placeholder="Adresse email" required>
-            <input type="password" name="password" placeholder="Mot de passe" required><br>
-            <a href="{{ url_for('forget_password')}}" class="forget-password">Mot de passe oublié?</a>
-            <button type="submit">se connecter</button>
-            </form>
-            <div class="social-login">
-                <p>Ou se connecter avec</p>
-                <a href="#"><img src="{{ url_for('static', filename='facebook.jpg')}}" alt="facebook"></a>
-                <a href="#"><img src="{{ url_for('static', filename='google.jpg')}}" alt="google"></a>
-                <a href="#"><img src="{{ url_for('static', filename='apple.png')}}" alt="apple"></a>
-            </div>
+<div class="login-page">
+  <!-- Partie image -->
+<div class="login-left">
+  
+  <!-- Lignes décoratives -->
+  <div class="decorative-lines">
+    <div class="line line1"></div>
+    <div class="line line2"></div>
+    <div class="line line3"></div>
+  </div>
+  
+  <!-- Cercles flottants -->
+  <div class="floating-circles">
+    <div class="circle circle1"></div>
+    <div class="circle circle2"></div>
+    <div class="circle circle3"></div>
+  </div>
+  
+  <!-- Icône distributeur automatique -->
+  <div class="vending-icon">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <rect x="4" y="2" width="16" height="20" rx="2" stroke="white" stroke-width="1.5" fill="none"/>
+      <rect x="6" y="5" width="4" height="3" rx="0.5" fill="white" opacity="0.8"/>
+      <rect x="11" y="5" width="4" height="3" rx="0.5" fill="white" opacity="0.8"/>
+      <rect x="16" y="5" width="2" height="3" rx="0.5" fill="white" opacity="0.8"/>
+      <rect x="6" y="9" width="4" height="3" rx="0.5" fill="white" opacity="0.8"/>
+      <rect x="11" y="9" width="4" height="3" rx="0.5" fill="white" opacity="0.8"/>
+      <rect x="16" y="9" width="2" height="3" rx="0.5" fill="white" opacity="0.8"/>
+      <rect x="6" y="13" width="4" height="3" rx="0.5" fill="white" opacity="0.8"/>
+      <rect x="11" y="13" width="4" height="3" rx="0.5" fill="white" opacity="0.8"/>
+      <rect x="16" y="13" width="2" height="3" rx="0.5" fill="white" opacity="0.8"/>
+      <rect x="7" y="18" width="10" height="2" rx="0.5" fill="white"/>
+    </svg>
+  </div>
+  
+  <p class="greeting">Salut !</p>
+  <h1>Bienvenue</h1>
+  <p>Gérez vos stocks et utilisateurs facilement avec notre système de distributeur automatique intelligent</p>
+  
+</div>
+  <!-- Partie formulaire -->
+  <div class="login-right">
+    <div class="login-box">
+      <img src="{{ url_for('static', filename='login.jpeg') }}" alt="Login Illustration">
+      <h2>Connexion</h2>
+      <p class="subtitle">Accédez à votre espace</p>
+
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="flash error">{{ messages[0] }}</div>
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" action="/authentification">
+
+        <div class="input-group">
+          <input type="email" name="email" required>
+          <label>Email</label>
+        </div>
+
+        <div class="input-group">
+          <input type="password" name="password" required>
+          <label>Mot de passe</label>
+        </div>
+
+        <a href="{{ url_for('forget_password') }}" class="forget-password">
+          Mot de passe oublié ?
+        </a>
+
+        <button type="submit" class="login-btn">
+          Se connecter
+        </button>
+
+      </form>
+
     </div>
+  </div>
+
+</div>
 </body>
 </html>

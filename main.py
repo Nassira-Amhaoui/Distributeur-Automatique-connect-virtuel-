@@ -3,6 +3,7 @@ from itsdangerous import URLSafeTimedSerializer
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from flask import session
+from translation import translations
 import pymysql
 import secrets
 app = Flask(__name__)
@@ -27,6 +28,13 @@ def admin_required(f):
             return redirect(url_for('dashboard'))
         return f(*args, **kwargs)
     return decorated_function
+
+@app.context_processor
+def inject_translator():
+    def t(key):
+        lang = session.get('language', 'fr')
+        return translations.get(lang, {}).get(key, key)
+    return dict(t=t)
 # logout route
 @app.route('/logout')
 def logout():
@@ -50,9 +58,8 @@ def index():
 def login_page():
     return render_template('login.html')
 # forgot password route
-@app.route('/forget_password', methods=['GET', 'post'])
+@app.route('/forget_password', methods=['GET', 'POST'])
 def forget_password():
-    reset_link = None
     if request.method == 'POST':
         email = request.form.get('email')
         conn = get_db_connection()
@@ -60,37 +67,31 @@ def forget_password():
         cursor.execute("SELECT * FROM utilisateurs WHERE email = %s", (email,))
         user = cursor.fetchone()
         conn.close()
+        cursor.close()
         if not user:
             flash("Cet email n'existe pas")
-        else:
-            token = serializer.dumps(email, salt='reset-password')
-            reset_link = url_for('reset_password', token=token, _external=True)
-            flash("Un lien de réinitialisation du mot de passe a été envoyé à votre adresse email.")
-    return render_template('forget_password.html', reset_link=reset_link)
+            return redirect(url_for('forget_password'))
+        return redirect(url_for('reset_password'))
+    return render_template('forget_password.html')
 # reset password route
-@app.route('/reset_password/<token>', methods=['GET', 'POST'])
-def reset_password(token):
-    try:
-        email = serializer.loads(token, salt='reset-password', max_age=900)
-    except:
-        flash("Le lien est invalide ou a expiré.")
-        return redirect(url_for('login_page'))
+@app.route('/reset_password', methods=['GET', 'POST'])
+def reset_password():
     if request.method == 'POST':
         password= request.form.get('password')
         confirm_password= request.form.get('confirm_password')
         if password != confirm_password:
             flash("Les mots de passe ne correspondent pas")
-            return redirect(url_for('reset_password', token=token))
+            return redirect(url_for('reset_password'))
         hashed_password = generate_password_hash(password)
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("UPDATE utilisateurs SET password = %s, reset_token = NULL WHERE email = %s",(hashed_password, email))
+        cursor.execute("UPDATE utilisateurs SET password = %s WHERE Id_user = %s",(hashed_password, session.get('user_id')))
         conn.commit()
         cursor.close()
         conn.close()
         flash("Mot de passe modifié avec succès!")
         return redirect(url_for('login_page'))
-    return render_template('reset_password.html', email=email, token=token)
+    return render_template('reset_password.html')
 # authentification route
 @app.route('/authentification', methods=['POST'])
 def authentificate():
@@ -112,6 +113,13 @@ def authentificate():
         session['username'] = user['UserName']
         session['email'] = user['email']
         session['role'] = user['role']
+        # Enrigistrer l'historique se connexions
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO login_history (user_id, date_login) VALUES (%s, NOW())", (user['Id_User'],))
+        conn.commit()
+        cursor.close()
+        conn.close()
         return redirect(url_for('dashboard'))
     else:
         flash( "Email ou mot de passe incorrect!")
@@ -145,13 +153,43 @@ def analytics():
 
 @app.route('/settings')
 @login_required
-@admin_required
 def settings():
-    if request.method == 'POST':
-        flash("Paramètres mis à jour avec succès!")
-        return redirect(url_for('settings'))
-    return render_template('settings.html')
+    conn = get_db_connection()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
 
+    last_logins = []
+    role_stats = []
+    total_users = 0
+
+    if session.get('role') == 'admin':
+        cursor.execute("""
+            SELECT u.UserName, u.email, u.role, l.date_login
+            FROM login_history l
+            INNER JOIN utilisateurs u ON l.user_id = u.Id_User
+            ORDER BY l.date_login DESC
+            LIMIT 5
+        """)
+        last_logins = cursor.fetchall()
+
+        cursor.execute("SELECT COUNT(*) AS total_users FROM utilisateurs")
+        total_users = cursor.fetchone()['total_users']
+
+        cursor.execute("""
+            SELECT role, COUNT(*) AS count
+            FROM utilisateurs
+            GROUP BY role
+        """)
+        role_stats = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template(
+        'settings.html',
+        last_logins=last_logins,
+        role_stats=role_stats,
+        total_users=total_users
+    )
 # update profile route
 @app.route('/settings/update_profile', methods=['POST'])
 @login_required
@@ -221,7 +259,7 @@ def update_preferences():
 
     flash("Préférences mises à jour avec succés", "success")
     return redirect(url_for('settings'))
-
+# add user route
 @app.route('/users/add', methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -252,6 +290,7 @@ def add_user():
               <a href="{reset_link}">{reset_link}</a>""", "success")
         return redirect(url_for('users'))
     return render_template('add_user.html')
+# edit user route
 @app.route('/users/edit/<int:user_id>', methods=['GET', 'POST'])
 def edit_user(user_id):
     conn = get_db_connection()
@@ -273,6 +312,7 @@ def edit_user(user_id):
         cursor.close()
         conn.close()
         return render_template('edit_user.html', user=user)
+# delete user route
 @app.route('/users/delete/<int:user_id>', methods=['POST'])
 def delete_user(user_id):
     conn = get_db_connection()
@@ -283,6 +323,32 @@ def delete_user(user_id):
     conn.close()
     flash("Utilisateur supprimé avec succès!")
     return redirect(url_for('users'))
+@app.route('/admin')
+@admin_required
+def admin_dashboard():
+    conn = get_db_connection()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+    cursor.execute("""
+        SELECT u.UserName, u.email, l.date_login, u.role
+        FROM login_history l
+        JOIN utilisateurs u ON l.user_id = u.Id_User
+        ORDER BY l.date_login DESC
+        LIMIT 5
+    """)
+    last_logins = cursor.fetchall()
+    print(" DEBUG last_logins=", last_logins)
+    cursor.execute("SELECT COUNT(*) as total_users FROM utilisateurs")
+    total_users = cursor.fetchone()['total_users']
+
+    cursor.execute("SELECT role, COUNT(*) as count FROM utilisateurs GROUP BY role")
+    role_stats = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template('admin.html', last_logins=last_logins,
+                           total_users=total_users, role_stats=role_stats)
 if __name__ == "__main__":
     app.run(debug=True)
         

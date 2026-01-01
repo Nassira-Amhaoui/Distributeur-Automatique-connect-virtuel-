@@ -44,6 +44,8 @@
             <a href="{{ url_for('users') }}"><i data-feather="users"></i> Users</a>
             <a href="{{ url_for('settings') }}"><i data-feather="settings"></i> Settings</a>
             {% endif %}
+            <!-- boutton logout -->
+            <a href="{{ url_for('logout') }}"><i data-feather="logout"></i> Logout</a>
         
         </nav>
 
@@ -92,8 +94,6 @@
 
 
                 <img src="https://via.placeholder.com/36" class="admin-img">
-                <!-- boutton logout -->
-                <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
             </div>
         </header>
         <section class="page-content">
