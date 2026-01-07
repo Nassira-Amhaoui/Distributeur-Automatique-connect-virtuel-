@@ -5,7 +5,6 @@ from functools import wraps
 from flask import session
 from translation import translations
 import pymysql
-import secrets
 app = Flask(__name__)
 app.secret_key='votre_cle_secrete'
 serializer= URLSafeTimedSerializer(app.secret_key)
@@ -41,6 +40,7 @@ def logout():
     session.clear()
     flash("Vous avez été déconnecté avec succès.")
     return redirect(url_for('login_page'))
+# Connection à la base de données
 def get_db_connection():
     return pymysql.connect(
         host="localhost",
@@ -113,6 +113,7 @@ def authentificate():
         session['username'] = user['UserName']
         session['email'] = user['email']
         session['role'] = user['role']
+        session['date_creation'] = user['Date_Creation']
         # Enrigistrer l'historique se connexions
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -292,6 +293,8 @@ def add_user():
     return render_template('add_user.html')
 # edit user route
 @app.route('/users/edit/<int:user_id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
 def edit_user(user_id):
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -314,6 +317,8 @@ def edit_user(user_id):
         return render_template('edit_user.html', user=user)
 # delete user route
 @app.route('/users/delete/<int:user_id>', methods=['POST'])
+@login_required
+@admin_required
 def delete_user(user_id):
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -324,6 +329,7 @@ def delete_user(user_id):
     flash("Utilisateur supprimé avec succès!")
     return redirect(url_for('users'))
 @app.route('/admin')
+@login_required
 @admin_required
 def admin_dashboard():
     conn = get_db_connection()
@@ -349,6 +355,7 @@ def admin_dashboard():
 
     return render_template('admin.html', last_logins=last_logins,
                            total_users=total_users, role_stats=role_stats)
+# lancer le serveur
 if __name__ == "__main__":
     app.run(debug=True)
         

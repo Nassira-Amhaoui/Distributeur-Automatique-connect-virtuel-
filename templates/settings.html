@@ -21,25 +21,58 @@
   </div>
 
   <!-- ===== PROFIL ===== -->
-  <div class="tab-section active" id="profile">
-    <h3>Informations du profil</h3>
+  <div class="tab-section" id="profile">
+  <h3>Mon Profil</h3>
 
-    <div class="form-group">
-      <label>Nom d'utilisateur</label>
-      <input type="text" value="{{ session.get('username') }}" disabled>
+  <div class="profile-container-pro">
+    <!-- Colonne gauche : Avatar et bienvenue -->
+    <div class="profile-left">
+      <div class="avatar-box">
+        <img src="{{ url_for('static', filename='avatar.jpg') }}" alt="Avatar">
+      </div>
+      <h2>Salut, {{ session.get('username') }}</h2>
+      <p>Bienvenue sur votre espace personnel</p>
     </div>
 
-    <div class="form-group">
-      <label>Email</label>
-      <input type="email" value="{{ session.get('email') or '' }}">
-    </div>
+    <!-- Colonne droite : Infos -->
+    <div class="profile-right">
+      <div class="info-card">
+        <i class="fa fa-user icon-card"></i>
+        <div>
+          <label>Nom d'utilisateur</label>
+          <p>{{ session.get('username') }}</p>
+        </div>
+      </div>
 
-    <div class="form-group">
-      <label>Rôle</label>
-      <input type="text" value="{{ session.get('role') }}" disabled>
+      <div class="info-card">
+        <i class="fa fa-envelope icon-card"></i>
+        <div>
+          <label>Email</label>
+          <p>{{ session.get('email') }}</p>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <i class="fa fa-shield icon-card"></i>
+        <div>
+          <label>Rôle</label>
+          <p>{{ session.get('role') }}</p>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <i class="fa fa-calendar icon-card"></i>
+        <div>
+          <label>Date de création</label>
+          <p>{{ session.get('date_creation') }}</p>
+        </div>
+      </div>
     </div>
   </div>
+</div>
 
+<!-- Font Awesome pour les icônes -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- ===== SECURITY ===== -->
   <div class="tab-section" id="security">
   <h3>Sécurité du compte</h3>

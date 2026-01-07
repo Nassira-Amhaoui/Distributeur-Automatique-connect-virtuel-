@@ -53,31 +53,41 @@
 {% endblock %}
 {%block js %}
 <script>
+    //récupere les élements 
     const modal = document.getElementById("userModal");
     const closeBtn = modal.querySelector(".close");
     const editForm = document.getElementById("editUserForm");
     const deleteBtn = document.getElementById("deletUserBtn");
-    document.querySelectorAll('.user-row').forEach(row => {
-        row.addEventListener('click', () => {
-            editForm.username.value = row.dataset.username;
-            editForm.email.value = row.dataset.email;
-            editForm.role.value = row.dataset.role;
-            editForm.action = `/users/edit/${row.dataset.id}`;
-            deleteBtn.onclick = () => {
-                if (confirm("Voulez-vous vraiment supprimer cet utilisateur ?")) {
-                    fetch(`/users/delete/${row.dataset.id}`, {
-                        method: 'POST'
-                    }).then(response => 
-                    location.reload());
-                }
-            };
-            modal.style.display = "block";
-        });
-    });
-    closeBtn.onclick = () => 
-        modal.style.display = "none";
-        window.onclick = (event) => {
-        if (event.target == modal) modal.style.display = "none";
+    //FONCTION POUR OUVRIR LE MODEL AVEC LES DONN2ES DE USER
+    const openModel = row => {
+        // Remlir le formulaire
+        editForm.username.value = row.dataset.username;
+        editForm.email.value = row.dataset.email;
+        editForm.role.value = row.dataset.role;
+        editForm.action = `/users/edit/${row.dataset.id}`;
+        //supprimer user
+        deleteBtn.onclick = () => {
+            if (confirm("Voulez-vous vraiment supprimer cet utilisateur ?")) {
+                fetch(`/users/delete/${row.dataset.id}`, {
+                    method: 'POST'}).then(() => location.reload());
+            }
+        };
+        // Afficher le modèle
+            modal.style.display = "flex";
     };
+    // Ajouter le clic sur chaque ligne du tableau
+    document.querySelectorAll('.user-row').forEach(row => {
+        row.addEventListener('click', () => openModel(row));
+    });
+    // Fermer le model au clic sur croix
+    closeBtn.onclick = () => {
+        modal.style.display = "none";
+    };
+    // Ferme le modal si clic en dehors
+    window.onclick = (event) => {
+    if (event.target === modal){
+        modal.style.display = "none";
+    }
+};
 </script>
 {% endblock %}
